@@ -6,14 +6,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Getter @Setter
-public class Reader {
+public abstract class ReaderDTO extends AbstractDTO<Long> {
     private String firstName;
     private String secondName;
     private String lastName;
-    private LocalDate birthday;
-    private int StudyGroup;
-    private String department;
-    private String degree;
-    private String grade;
-    private String faculty;
+    private String birthday;
 }
