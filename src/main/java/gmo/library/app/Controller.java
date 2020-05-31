@@ -18,7 +18,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Controller {
     @FXML private Button readerSearchButton;
@@ -103,17 +106,20 @@ public class Controller {
         Response<SpringJson<List<ReadingRoomDTO>>> readingRooms = readingRoomRepository.getAllReadingRooms().execute();
         pointOfIssueBox.getItems().clear();
         pointOfIssueBox.getItems().add(null);
+        pointOfIssueBox.getSelectionModel().selectFirst();
         pointOfIssueBox.getItems().addAll(tickets.body().getContent());
         pointOfIssueBox.getItems().addAll(readingRooms.body().getContent());
 
         Response<SpringJson<List<DepartmentDTO>>> departments = departmentRepository.getAllDepartments().execute();
         departmentBox.getItems().clear();
         departmentBox.getItems().add(null);
+        departmentBox.getSelectionModel().selectFirst();
         departmentBox.getItems().addAll(departments.body().getContent());
 
         Response<SpringJson<List<FacultyDTO>>> faculties = facultyRepository.getAllFaculties().execute();
         facultyBox.getItems().clear();
         facultyBox.getItems().add(null);
+        facultyBox.getSelectionModel().selectFirst();
         facultyBox.getItems().addAll(faculties.body().getContent());
 
         Response<SpringJson<List<StudyGroupDTO>>> studyGroups = studyGroupRepository.getAllStudyGroups().execute();
@@ -125,37 +131,44 @@ public class Controller {
 
     private void fillReaderTableByRetrofit() throws IOException {
         StudyGroupDTO studyGroupDTO = groupBox.getSelectionModel().getSelectedItem();
+        PointOfIssueDTO pointOfIssueDTO = pointOfIssueBox.getSelectionModel().getSelectedItem();
+        DepartmentDTO departmentDTO = departmentBox.getSelectionModel().getSelectedItem();
+        FacultyDTO facultyDTO = facultyBox.getSelectionModel().getSelectedItem();
+        String[] nameArray = fullNameField.getText().split(" ");
+        List<String> nameList = new ArrayList<>();
+        for(int i = 0; i < 3; i++) {
+            try {
+                nameList.add(nameArray[i]);
+            }
+            catch (ArrayIndexOutOfBoundsException aioobe) {
+                nameList.add("");
+            }
+        }
         Response<SpringJson<List<StudentDTO>>> students = studentRepository.getStudentsByParams(
-                fullNameField.getText(), studyGroupDTO == null ? 0 : studyGroupDTO.getId()).execute();
-        System.out.println(studentRepository.getStudentsByParams(
-                fullNameField.getText(), studyGroupDTO == null ? 0 : studyGroupDTO.getId()).request().toString());
-        /*
-        Response<SpringJson<List<TeacherDTO>>> teachers = teacherRepository.getAllTeachers().execute();
-        Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = oneTimeReaderRepository.getAllOneTimeReaders().execute();
-        */
+                nameList.get(0), nameList.get(1), nameList.get(2), studyGroupDTO == null ? 0 : studyGroupDTO.getId(),
+                pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
+        Response<SpringJson<List<TeacherDTO>>> teachers = teacherRepository.getTeachersByParams(
+                nameList.get(0), nameList.get(1), nameList.get(2), departmentDTO == null ? 0 : departmentDTO.getId(),
+                pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
+        Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = oneTimeReaderRepository.getOneTimeReadersByParams(
+                nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId()).execute();
 
         readerTable.getItems().clear();
-        System.out.println(students.message());
-        for(StudentDTO student : students.body().getContent()) {
-            if(student.getFirstName() == null) {
+        System.out.println(teachers.toString());
+        processReaders(students.body().getContent());
+        processReaders(teachers.body().getContent());
+        processReaders(oneTimeReaders.body().getContent());
+    }
+
+    private <T extends ReaderDTO> void processReaders(List<T> readers) {
+        for(ReaderDTO readerDTO : readers) {
+            if(readerDTO.getFirstName() == null) {
                 break;
             }
             FullReader reader = new FullReader();
-            setReader(reader, student);
+            setReader(reader, readerDTO);
             readerTable.getItems().add(reader);
         }
-        /*
-        for(TeacherDTO teacher : teachers.body().getContent()) {
-            FullReader reader = new FullReader();
-            setReader(reader, teacher);
-            readerTable.getItems().add(reader);
-        }
-        for(OneTimeReaderDTO oneTimeReader : oneTimeReaders.body().getContent()) {
-            FullReader reader = new FullReader();
-            setReader(reader, oneTimeReader);
-            readerTable.getItems().add(reader);
-        }
-        */
     }
 
     private void setReader(FullReader reader, ReaderDTO dto) {
