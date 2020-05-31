@@ -1,17 +1,10 @@
 package gmo.library.app;
 
-import com.google.gson.JsonElement;
-import feign.Client;
-import feign.Feign;
-import feign.codec.Encoder;
 import gmo.library.app.DTO.*;
 import gmo.library.app.Repositories.*;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,11 +18,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.time.LocalDate;
 import java.util.List;
 
 public class Controller {
     @FXML private Button readerSearchButton;
+    //данные для поиска
+    @FXML private ComboBox<PointOfIssueDTO> pointOfIssueBox;
+    @FXML private ComboBox<DepartmentDTO> departmentBox;
+    @FXML private ComboBox<FacultyDTO> facultyBox;
+    @FXML private ComboBox<StudyGroupDTO> groupBox;
+    @FXML private TextField fullNameField;
+    @FXML private DatePicker birthdayPicker;
+    //таблица
     @FXML private TableView<FullReader> readerTable;
     @FXML private TableColumn<FullReader, String> readerColumnName;
     @FXML private TableColumn<FullReader, String> readerColumnBirthday;
@@ -40,15 +40,35 @@ public class Controller {
     @FXML private TableColumn<FullReader, String> readerColumnGrade;
 
     private Retrofit retrofit;
+
     private StudentRepository studentRepository;
     private TeacherRepository teacherRepository;
     private OneTimeReaderRepository oneTimeReaderRepository;
 
+    private ReadingRoomRepository readingRoomRepository;
+    private TicketRepository ticketRepository;
+
+    private DepartmentRepository departmentRepository;
+
+    private FacultyRepository facultyRepository;
+
+    private StudyGroupRepository studyGroupRepository;
+
     public Controller() {
         retrofit = new Retrofit.Builder().baseUrl("http://localhost:8080/").addConverterFactory(GsonConverterFactory.create()).build();
+
         studentRepository = retrofit.create(StudentRepository.class);
         teacherRepository = retrofit.create(TeacherRepository.class);
         oneTimeReaderRepository = retrofit.create(OneTimeReaderRepository.class);
+
+        readingRoomRepository = retrofit.create(ReadingRoomRepository.class);
+        ticketRepository = retrofit.create(TicketRepository.class);
+
+        departmentRepository = retrofit.create(DepartmentRepository.class);
+
+        facultyRepository = retrofit.create(FacultyRepository.class);
+
+        studyGroupRepository = retrofit.create(StudyGroupRepository.class);
 
         //studentRepository = Feign.builder().target(StudentRepository.class, "http://localhost:8080/");
     }
@@ -70,19 +90,61 @@ public class Controller {
                 e.printStackTrace();
             }
         });
+
+        try {
+            updateSearchInfo();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateSearchInfo() throws IOException {
+        Response<SpringJson<List<TicketDTO>>> tickets = ticketRepository.getAllTickets().execute();
+        Response<SpringJson<List<ReadingRoomDTO>>> readingRooms = readingRoomRepository.getAllReadingRooms().execute();
+        pointOfIssueBox.getItems().clear();
+        pointOfIssueBox.getItems().add(null);
+        pointOfIssueBox.getItems().addAll(tickets.body().getContent());
+        pointOfIssueBox.getItems().addAll(readingRooms.body().getContent());
+
+        Response<SpringJson<List<DepartmentDTO>>> departments = departmentRepository.getAllDepartments().execute();
+        departmentBox.getItems().clear();
+        departmentBox.getItems().add(null);
+        departmentBox.getItems().addAll(departments.body().getContent());
+
+        Response<SpringJson<List<FacultyDTO>>> faculties = facultyRepository.getAllFaculties().execute();
+        facultyBox.getItems().clear();
+        facultyBox.getItems().add(null);
+        facultyBox.getItems().addAll(faculties.body().getContent());
+
+        Response<SpringJson<List<StudyGroupDTO>>> studyGroups = studyGroupRepository.getAllStudyGroups().execute();
+        groupBox.getItems().clear();
+        groupBox.getItems().add(null);
+        groupBox.getSelectionModel().selectFirst();
+        groupBox.getItems().addAll(studyGroups.body().getContent());
     }
 
     private void fillReaderTableByRetrofit() throws IOException {
-        Response<SpringJson<List<StudentDTO>>> students = studentRepository.getAllStudents().execute();
+        StudyGroupDTO studyGroupDTO = groupBox.getSelectionModel().getSelectedItem();
+        Response<SpringJson<List<StudentDTO>>> students = studentRepository.getStudentsByParams(
+                fullNameField.getText(), studyGroupDTO == null ? 0 : studyGroupDTO.getId()).execute();
+        System.out.println(studentRepository.getStudentsByParams(
+                fullNameField.getText(), studyGroupDTO == null ? 0 : studyGroupDTO.getId()).request().toString());
+        /*
         Response<SpringJson<List<TeacherDTO>>> teachers = teacherRepository.getAllTeachers().execute();
         Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = oneTimeReaderRepository.getAllOneTimeReaders().execute();
+        */
 
         readerTable.getItems().clear();
+        System.out.println(students.message());
         for(StudentDTO student : students.body().getContent()) {
+            if(student.getFirstName() == null) {
+                break;
+            }
             FullReader reader = new FullReader();
             setReader(reader, student);
             readerTable.getItems().add(reader);
         }
+        /*
         for(TeacherDTO teacher : teachers.body().getContent()) {
             FullReader reader = new FullReader();
             setReader(reader, teacher);
@@ -93,6 +155,7 @@ public class Controller {
             setReader(reader, oneTimeReader);
             readerTable.getItems().add(reader);
         }
+        */
     }
 
     private void setReader(FullReader reader, ReaderDTO dto) {

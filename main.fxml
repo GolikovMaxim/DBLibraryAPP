@@ -16,13 +16,12 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <ComboBox layoutX="16.0" layoutY="15.0" prefHeight="25.0" prefWidth="140.0" promptText="Пункт выдачи" />
-                  <ComboBox layoutX="173.0" layoutY="15.0" prefWidth="140.0" promptText="Кафедра" />
-                  <ComboBox layoutX="330.0" layoutY="15.0" prefWidth="140.0" promptText="Факультет" />
-                  <ComboBox layoutX="487.0" layoutY="15.0" prefWidth="140.0" promptText="Курс" />
-                  <ComboBox layoutX="644.0" layoutY="15.0" prefWidth="140.0" promptText="Группа" />
-                  <TextField layoutX="16.0" layoutY="55.0" prefWidth="376.0" promptText="ФИО читателя" />
-                  <DatePicker layoutX="408.0" layoutY="55.0" prefWidth="200.0" promptText="Дата рождения" />
+                  <ComboBox fx:id="pointOfIssueBox" layoutX="16.0" layoutY="15.0" prefHeight="25.0" prefWidth="180.0" promptText="Пункт выдачи" />
+                  <ComboBox fx:id="departmentBox" layoutX="212.0" layoutY="15.0" prefWidth="180.0" promptText="Кафедра" />
+                  <ComboBox fx:id="facultyBox" layoutX="408.0" layoutY="15.0" prefWidth="180.0" promptText="Факультет" />
+                  <ComboBox fx:id="groupBox" layoutX="604.0" layoutY="15.0" prefWidth="180.0" promptText="Группа" />
+                  <TextField fx:id="fullNameField" layoutX="16.0" layoutY="55.0" prefWidth="376.0" promptText="ФИО читателя" />
+                  <DatePicker fx:id="birthdayPicker" layoutX="408.0" layoutY="55.0" prefWidth="200.0" promptText="Дата рождения" />
                   <Button fx:id="readerSearchButton" layoutX="624.0" layoutY="55.0" mnemonicParsing="false" prefWidth="160.0" text="Поиск" />
                   <TableView fx:id="readerTable" layoutX="16.0" layoutY="95.0" prefHeight="460.0" prefWidth="768.0">
                     <columns>
