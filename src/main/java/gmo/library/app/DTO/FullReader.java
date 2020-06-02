@@ -9,7 +9,7 @@ public class FullReader {
     private String secondName;
     private String lastName;
     private String birthday;
-    private long studyGroup;
+    private StudyGroupDTO studyGroup;
     private String department;
     private String degree;
     private String grade;

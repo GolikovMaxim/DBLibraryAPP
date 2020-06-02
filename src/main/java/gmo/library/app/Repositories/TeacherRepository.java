@@ -2,7 +2,9 @@ package gmo.library.app.Repositories;
 
 import gmo.library.app.DTO.TeacherDTO;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 import java.util.List;
@@ -14,4 +16,6 @@ public interface TeacherRepository {
     Call<SpringJson<List<TeacherDTO>>> getTeachersByParams(@Query("lastName") String lastName, @Query("firstName") String firstName,
                                                            @Query("secondName") String secondName, @Query("department") long department,
                                                            @Query("poiid") long poiid, @Query("faculty") long faculty);
+    @POST("teachers")
+    Call<TeacherDTO> addTeacher(@Body TeacherDTO teacherDTO);
 }

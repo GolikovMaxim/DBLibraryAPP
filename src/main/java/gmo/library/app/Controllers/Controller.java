@@ -1,10 +1,15 @@
-package gmo.library.app;
+package gmo.library.app.Controllers;
 
 import gmo.library.app.DTO.*;
+import gmo.library.app.Main;
 import gmo.library.app.Repositories.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,10 +17,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -25,13 +28,13 @@ import java.util.Optional;
 
 public class Controller {
     @FXML private Button readerSearchButton;
+    @FXML private Button readerCreateButton;
     //данные для поиска
     @FXML private ComboBox<PointOfIssueDTO> pointOfIssueBox;
     @FXML private ComboBox<DepartmentDTO> departmentBox;
     @FXML private ComboBox<FacultyDTO> facultyBox;
     @FXML private ComboBox<StudyGroupDTO> groupBox;
     @FXML private TextField fullNameField;
-    @FXML private DatePicker birthdayPicker;
     //таблица
     @FXML private TableView<FullReader> readerTable;
     @FXML private TableColumn<FullReader, String> readerColumnName;
@@ -42,51 +45,20 @@ public class Controller {
     @FXML private TableColumn<FullReader, String> readerColumnDegree;
     @FXML private TableColumn<FullReader, String> readerColumnGrade;
 
-    private Retrofit retrofit;
-
-    private StudentRepository studentRepository;
-    private TeacherRepository teacherRepository;
-    private OneTimeReaderRepository oneTimeReaderRepository;
-
-    private ReadingRoomRepository readingRoomRepository;
-    private TicketRepository ticketRepository;
-
-    private DepartmentRepository departmentRepository;
-
-    private FacultyRepository facultyRepository;
-
-    private StudyGroupRepository studyGroupRepository;
-
     public Controller() {
-        retrofit = new Retrofit.Builder().baseUrl("http://localhost:8080/").addConverterFactory(GsonConverterFactory.create()).build();
 
-        studentRepository = retrofit.create(StudentRepository.class);
-        teacherRepository = retrofit.create(TeacherRepository.class);
-        oneTimeReaderRepository = retrofit.create(OneTimeReaderRepository.class);
-
-        readingRoomRepository = retrofit.create(ReadingRoomRepository.class);
-        ticketRepository = retrofit.create(TicketRepository.class);
-
-        departmentRepository = retrofit.create(DepartmentRepository.class);
-
-        facultyRepository = retrofit.create(FacultyRepository.class);
-
-        studyGroupRepository = retrofit.create(StudyGroupRepository.class);
-
-        //studentRepository = Feign.builder().target(StudentRepository.class, "http://localhost:8080/");
     }
 
     public void init() {
         readerColumnName.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getLastName() + " " + cellData.getValue().getFirstName() + " " + cellData.getValue().getSecondName()));
         readerColumnBirthday.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBirthday()));
-        readerColumnGroup.setCellValueFactory(cellData -> new SimpleStringProperty("" + (cellData.getValue().getStudyGroup() == 0 ? "" : cellData.getValue().getStudyGroup())));
+        readerColumnGroup.setCellValueFactory(cellData -> new SimpleStringProperty("" + (cellData.getValue().getStudyGroup() == null ? "" : cellData.getValue().getStudyGroup())));
         readerColumnFaculty.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFaculty()));
         readerColumnDepartment.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDepartment()));
         readerColumnDegree.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDegree()));
         readerColumnGrade.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getGrade()));
         readerSearchButton.setOnAction(event -> {
-            //fillReaderTableByJSON();
             try {
                 fillReaderTableByRetrofit();
             } catch (IOException e) {
@@ -99,34 +71,65 @@ public class Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        readerCreateButton.setOnAction(event -> {
+            try {
+                Stage readerCreate = new Stage();
+                FXMLLoader fxmlLoader = new FXMLLoader(new File("readerCreate.fxml").toURI().toURL());
+                Scene scene = new Scene(fxmlLoader.load());
+                ((ReaderCreateController)fxmlLoader.getController()).init(readerCreate);
+
+                readerCreate.setTitle("Добавление читателя");
+                readerCreate.setScene(scene);
+                readerCreate.setResizable(false);
+                readerCreate.initModality(Modality.APPLICATION_MODAL);
+                readerCreate.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void updateSearchInfo() throws IOException {
-        Response<SpringJson<List<TicketDTO>>> tickets = ticketRepository.getAllTickets().execute();
-        Response<SpringJson<List<ReadingRoomDTO>>> readingRooms = readingRoomRepository.getAllReadingRooms().execute();
-        pointOfIssueBox.getItems().clear();
-        pointOfIssueBox.getItems().add(null);
-        pointOfIssueBox.getSelectionModel().selectFirst();
-        pointOfIssueBox.getItems().addAll(tickets.body().getContent());
-        pointOfIssueBox.getItems().addAll(readingRooms.body().getContent());
+        updatePointOfIssues(pointOfIssueBox, true);
+        updateDepartments(departmentBox, true);
+        updateFaculties(facultyBox, true);
 
-        Response<SpringJson<List<DepartmentDTO>>> departments = departmentRepository.getAllDepartments().execute();
-        departmentBox.getItems().clear();
-        departmentBox.getItems().add(null);
-        departmentBox.getSelectionModel().selectFirst();
-        departmentBox.getItems().addAll(departments.body().getContent());
-
-        Response<SpringJson<List<FacultyDTO>>> faculties = facultyRepository.getAllFaculties().execute();
-        facultyBox.getItems().clear();
-        facultyBox.getItems().add(null);
-        facultyBox.getSelectionModel().selectFirst();
-        facultyBox.getItems().addAll(faculties.body().getContent());
-
-        Response<SpringJson<List<StudyGroupDTO>>> studyGroups = studyGroupRepository.getAllStudyGroups().execute();
+        Response<SpringJson<List<StudyGroupDTO>>> studyGroups = Main.studyGroupRepository.getAllStudyGroups().execute();
         groupBox.getItems().clear();
         groupBox.getItems().add(null);
         groupBox.getSelectionModel().selectFirst();
         groupBox.getItems().addAll(studyGroups.body().getContent());
+    }
+
+    public static void updateDepartments(ComboBox<DepartmentDTO> departmentBox, boolean addNull) throws IOException {
+        Response<SpringJson<List<DepartmentDTO>>> departments = Main.departmentRepository.getAllDepartments().execute();
+        update(departmentBox, departments.body().getContent(), addNull);
+    }
+
+    public static void updateFaculties(ComboBox<FacultyDTO> facultyBox, boolean addNull) throws IOException {
+        Response<SpringJson<List<FacultyDTO>>> faculties = Main.facultyRepository.getAllFaculties().execute();
+        update(facultyBox, faculties.body().getContent(), addNull);
+    }
+
+    public static void updatePointOfIssues(ComboBox<PointOfIssueDTO> pointOfIssueBox, boolean addNull) throws IOException {
+        Response<SpringJson<List<TicketDTO>>> tickets = Main.ticketRepository.getAllTickets().execute();
+        Response<SpringJson<List<ReadingRoomDTO>>> readingRooms = Main.readingRoomRepository.getAllReadingRooms().execute();
+        pointOfIssueBox.getItems().clear();
+        if(addNull) {
+            pointOfIssueBox.getItems().add(null);
+        }
+        pointOfIssueBox.getItems().addAll(tickets.body().getContent());
+        pointOfIssueBox.getItems().addAll(readingRooms.body().getContent());
+        pointOfIssueBox.getSelectionModel().selectFirst();
+    }
+
+    public static <T> void update(ComboBox<T> box, List<T> list, boolean addNull) {
+        box.getItems().clear();
+        if(addNull) {
+            box.getItems().add(null);
+        }
+        box.getItems().addAll(list);
+        box.getSelectionModel().selectFirst();
     }
 
     private void fillReaderTableByRetrofit() throws IOException {
@@ -144,20 +147,26 @@ public class Controller {
                 nameList.add("");
             }
         }
-        Response<SpringJson<List<StudentDTO>>> students = studentRepository.getStudentsByParams(
-                nameList.get(0), nameList.get(1), nameList.get(2), studyGroupDTO == null ? 0 : studyGroupDTO.getId(),
-                pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
-        Response<SpringJson<List<TeacherDTO>>> teachers = teacherRepository.getTeachersByParams(
-                nameList.get(0), nameList.get(1), nameList.get(2), departmentDTO == null ? 0 : departmentDTO.getId(),
-                pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
-        Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = oneTimeReaderRepository.getOneTimeReadersByParams(
-                nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId()).execute();
 
         readerTable.getItems().clear();
-        System.out.println(teachers.toString());
-        processReaders(students.body().getContent());
-        processReaders(teachers.body().getContent());
-        processReaders(oneTimeReaders.body().getContent());
+
+        if(departmentDTO == null) {
+            Response<SpringJson<List<StudentDTO>>> students = Main.studentRepository.getStudentsByParams(
+                    nameList.get(0), nameList.get(1), nameList.get(2), studyGroupDTO == null ? 0 : studyGroupDTO.getId(),
+                    pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
+            processReaders(students.body().getContent());
+        }
+        if(studyGroupDTO == null) {
+            Response<SpringJson<List<TeacherDTO>>> teachers = Main.teacherRepository.getTeachersByParams(
+                    nameList.get(0), nameList.get(1), nameList.get(2), departmentDTO == null ? 0 : departmentDTO.getId(),
+                    pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
+            processReaders(teachers.body().getContent());
+        }
+        if(studyGroupDTO == null && departmentDTO == null && facultyDTO == null) {
+            Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = Main.oneTimeReaderRepository.getOneTimeReadersByParams(
+                    nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId()).execute();
+            processReaders(oneTimeReaders.body().getContent());
+        }
     }
 
     private <T extends ReaderDTO> void processReaders(List<T> readers) {
@@ -177,7 +186,7 @@ public class Controller {
         reader.setLastName(dto.getLastName());
         reader.setBirthday(dto.getBirthday());
         if(dto.getClass().equals(StudentDTO.class)) {
-            reader.setStudyGroup(((StudentDTO)dto).getGroup().getId());
+            reader.setStudyGroup(((StudentDTO)dto).getGroup());
             reader.setFaculty(((StudentDTO)dto).getGroup().getFaculty().toString());
         }
         else if(dto.getClass().equals(TeacherDTO.class)) {
@@ -188,6 +197,7 @@ public class Controller {
         }
     }
 
+    @Deprecated
     private void fillReaderTableByJSON() {
         JSONObject studentsJson = null;
         JSONObject teachersJson = null;
@@ -207,11 +217,11 @@ public class Controller {
             FullReader reader = new FullReader();
             JSONObject studentJson = studentJSONs.getJSONObject(i);
             setReader(reader, studentJson);
-            try {
+            /*try {
                 reader.setStudyGroup(getForeignData(studentJson, "group").getInt("id"));
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
             readerTable.getItems().add(reader);
         }
         for(int i = 0; i < teacherJSONs.length(); i++) {
