@@ -14,5 +14,11 @@ public interface StudentRepository {
                                                            @Query("secondName") String secondName, @Query("group") long group,
                                                            @Query("poiid") long poiid, @Query("faculty") long faculty);
     @POST("students")
-    Call<StudentDTO> addStudent(@Body StudentDTO studentDTO);
+    Call<StudentDTO> createStudent(@Body StudentDTO studentDTO);
+
+    @PATCH("students/{id}")
+    Call<StudentDTO> updateStudent(@Path("id") String id, @Body StudentDTO studentDTO);
+
+    @DELETE("students/{id}")
+    Call<StudentDTO> deleteStudent(@Path("id") String id);
 }

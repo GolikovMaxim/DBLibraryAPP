@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class FullReader {
+    private Long id;
     private String firstName;
     private String secondName;
     private String lastName;
@@ -14,4 +15,6 @@ public class FullReader {
     private String degree;
     private String grade;
     private String faculty;
+    private PointOfIssueDTO pointOfIssue;
+    private String takeDate;
 }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gmo.library.app.Controllers.ReaderCreateController">
+   <children>
+      <TabPane fx:id="typePane" layoutY="160.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="400.0" tabClosingPolicy="UNAVAILABLE">
+         <tabs>
+            <Tab fx:id="studentTab" text="Студент">
+               <content>
+                  <Pane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="studyGroupField" layoutX="10.0" layoutY="20.0" prefWidth="185.0" promptText="Группа" />
+                        <ComboBox fx:id="studentPointOfIssueBox" layoutX="10.0" layoutY="60.0" prefWidth="185.0" promptText="Пункт выдачи" />
+                        <ComboBox fx:id="facultyBox" layoutX="205.0" layoutY="20.0" prefWidth="185.0" promptText="Факультет" />
+                     </children>
+                  </Pane>
+               </content>
+            </Tab>
+            <Tab fx:id="teacherTab" text="Преподаватель">
+               <content>
+                  <Pane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <ComboBox fx:id="departmentBox" layoutX="10.0" layoutY="20.0" prefWidth="185.0" promptText="Кафедра" />
+                        <ComboBox fx:id="degreeBox" layoutX="205.0" layoutY="20.0" prefWidth="185.0" promptText="Степень" />
+                        <ComboBox fx:id="gradeBox" layoutX="10.0" layoutY="60.0" prefWidth="185.0" promptText="Звание" />
+                        <ComboBox fx:id="teacherPointOfIssueBox" layoutX="205.0" layoutY="60.0" prefWidth="185.0" promptText="Пункт выдачи" />
+                     </children>
+                  </Pane>
+               </content>
+            </Tab>
+            <Tab fx:id="oneTimeReaderTab" text="Одноразовый читатель">
+               <content>
+                  <Pane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <ComboBox fx:id="readingRoomBox" layoutX="10.0" layoutY="40.0" prefWidth="185.0" promptText="Читальный зал" />
+                        <DatePicker fx:id="takeDatePicker" layoutX="205.0" layoutY="40.0" prefHeight="25.0" prefWidth="185.0" promptText="Дата получения" />
+                     </children>
+                  </Pane>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+      <TextField fx:id="lastNameField" layoutX="10.0" layoutY="55.0" prefWidth="185.0" promptText="Фамилия" />
+      <TextField fx:id="firstNameField" layoutX="205.0" layoutY="55.0" prefWidth="185.0" promptText="Имя" />
+      <TextField fx:id="secondNameField" layoutX="10.0" layoutY="90.0" prefWidth="185.0" promptText="Отчество" />
+      <DatePicker fx:id="birthdayPicker" layoutX="205.0" layoutY="90.0" prefHeight="25.0" prefWidth="185.0" promptText="Дата рождения" />
+      <Button fx:id="createButton" layoutX="10.0" layoutY="125.0" mnemonicParsing="false" prefWidth="380.0" text="Создать" />
+      <Label fx:id="titleLabel" alignment="CENTER" layoutX="50.0" layoutY="18.0" prefWidth="300.0" text="Добавление читателя">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+   </children>
+</Pane>

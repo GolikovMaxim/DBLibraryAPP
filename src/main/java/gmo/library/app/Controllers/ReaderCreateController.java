@@ -10,6 +10,7 @@ import retrofit2.Response;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ReaderCreateController {
@@ -34,6 +35,8 @@ public class ReaderCreateController {
     //одноразовый читатель
     @FXML private ComboBox<ReadingRoomDTO> readingRoomBox;
     @FXML private DatePicker takeDatePicker;
+    //заголовок
+    @FXML private Label titleLabel;
 
     @FXML private Button createButton;
 
@@ -41,8 +44,12 @@ public class ReaderCreateController {
 
     }
 
-    public void init(Stage stage) throws IOException {
+    public void init(Stage stage, FullReader reader) throws IOException {
         updateBoxesInfo();
+        if(reader != null) {
+            stage.setTitle("Изменение читателя");
+        }
+        updateReaderInfo(reader);
         createButton.setOnAction(event -> {
             if(lastNameField.getText().equals("") || firstNameField.getText().equals("") ||
                     secondNameField.getText().equals("") || birthdayPicker.getValue() == null) {
@@ -64,18 +71,20 @@ public class ReaderCreateController {
                 studyGroupDTO.setNumber(Integer.parseInt(studyGroupField.getText()));
                 studyGroupDTO.setFaculty(facultyBox.getSelectionModel().getSelectedItem());
                 try {
-                    Response<StudyGroupDTO> response = Main.studyGroupRepository.addStudyGroup(studyGroupDTO).execute();
-                    if(response.body() == null) {
-                        Main.error("Произошла ошибка.\n" + response.toString());
-                        return;
-                    }
+                    Main.studyGroupRepository.addStudyGroup(studyGroupDTO).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 studentDTO.setGroup(studyGroupDTO);
                 try {
-                    Response<StudentDTO> response = Main.studentRepository.addStudent(studentDTO).execute();
-                    if(response.body() == null) {
+                    Response<StudentDTO> response;
+                    if(reader == null) {
+                        response = Main.studentRepository.createStudent(studentDTO).execute();
+                    }
+                    else {
+                        response = Main.studentRepository.updateStudent(reader.getId().toString(), studentDTO).execute();
+                    }
+                    if(reader == null && response.body() == null) {
                         Main.error("Произошла ошибка.\n" + response.toString());
                         return;
                     }
@@ -96,8 +105,14 @@ public class ReaderCreateController {
                 teacherDTO.setGrade(gradeBox.getSelectionModel().getSelectedItem());
                 teacherDTO.setPointOfIssue(teacherPointOfIssueBox.getSelectionModel().getSelectedItem());
                 try {
-                    Response<TeacherDTO> response = Main.teacherRepository.addTeacher(teacherDTO).execute();
-                    if(response.body().getFirstName() == null) {
+                    Response<TeacherDTO> response;
+                    if(reader == null) {
+                        response = Main.teacherRepository.createTeacher(teacherDTO).execute();
+                    }
+                    else {
+                        response = Main.teacherRepository.updateTeacher(reader.getId().toString(), teacherDTO).execute();
+                    }
+                    if(reader == null && response.body() == null) {
                         Main.error("Произошла ошибка." + response.toString());
                         return;
                     }
@@ -120,8 +135,14 @@ public class ReaderCreateController {
                 oneTimeReaderDTO.setReadingRoom(readingRoomBox.getSelectionModel().getSelectedItem());
                 oneTimeReaderDTO.setTakeDate(takeDatePicker.getValue().toString());
                 try {
-                    Response<OneTimeReaderDTO> response = Main.oneTimeReaderRepository.addOneTimeReader(oneTimeReaderDTO).execute();
-                    if(response.body().getFirstName() == null) {
+                    Response<OneTimeReaderDTO> response;
+                    if(reader == null) {
+                        response = Main.oneTimeReaderRepository.createOneTimeReader(oneTimeReaderDTO).execute();
+                    }
+                    else {
+                        response = Main.oneTimeReaderRepository.updateOneTimeReader(reader.getId().toString(), oneTimeReaderDTO).execute();
+                    }
+                    if(reader == null && response.body() == null) {
                         Main.error("Произошла ошибка." + response.toString());
                         return;
                     }
@@ -135,6 +156,58 @@ public class ReaderCreateController {
                 }
             }
         });
+    }
+
+    private void updateReaderInfo(FullReader reader) {
+        if(reader == null) {
+            return;
+        }
+        titleLabel.setText("Изменение читателя");
+        createButton.setText("Изменить");
+        lastNameField.setText(reader.getLastName());
+        firstNameField.setText(reader.getFirstName());
+        secondNameField.setText(reader.getSecondName());
+        birthdayPicker.setValue(LocalDate.parse(reader.getBirthday()));
+        if(reader.getStudyGroup() != null) {
+            teacherTab.setDisable(true);
+            oneTimeReaderTab.setDisable(true);
+            typePane.getSelectionModel().select(studentTab);
+            studyGroupField.setText(reader.getStudyGroup().toString());
+            for(FacultyDTO faculty : facultyBox.getItems()) {
+                if(faculty.getName().equals(reader.getFaculty())) {
+                    facultyBox.getSelectionModel().select(faculty);
+                }
+            }
+            studentPointOfIssueBox.getSelectionModel().select(reader.getPointOfIssue());
+        }
+        if(reader.getDegree() != null) {
+            studentTab.setDisable(true);
+            oneTimeReaderTab.setDisable(true);
+            typePane.getSelectionModel().select(teacherTab);
+            for(DepartmentDTO department : departmentBox.getItems()) {
+                if(department.getName().equals(reader.getDepartment())) {
+                    departmentBox.getSelectionModel().select(department);
+                }
+            }
+            for(DegreeDTO degree : degreeBox.getItems()) {
+                if(degree.getName().equals(reader.getDegree())) {
+                    degreeBox.getSelectionModel().select(degree);
+                }
+            }
+            for(GradeDTO grade : gradeBox.getItems()) {
+                if(grade.getName().equals(reader.getDegree())) {
+                    gradeBox.getSelectionModel().select(grade);
+                }
+            }
+            teacherPointOfIssueBox.getSelectionModel().select(reader.getPointOfIssue());
+        }
+        if(reader.getTakeDate() != null) {
+            studentTab.setDisable(true);
+            teacherTab.setDisable(true);
+            typePane.getSelectionModel().select(oneTimeReaderTab);
+            readingRoomBox.getSelectionModel().select((ReadingRoomDTO) reader.getPointOfIssue());
+            takeDatePicker.setValue(LocalDate.parse(reader.getTakeDate()));
+        }
     }
 
     private void setCommonFields(ReaderDTO readerDTO) {

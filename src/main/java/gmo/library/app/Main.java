@@ -11,7 +11,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.context.ConfigurableApplicationContext;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -64,7 +63,7 @@ public class Main extends Application {
 
         studyGroupRepository = retrofit.create(StudyGroupRepository.class);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(new File("main.fxml").toURI().toURL());
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("main.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         ((Controller)fxmlLoader.getController()).init();
         primaryStage.setOnCloseRequest(event -> {

@@ -2,7 +2,7 @@ package gmo.library.app.Controllers;
 
 import gmo.library.app.DTO.*;
 import gmo.library.app.Main;
-import gmo.library.app.Repositories.*;
+import gmo.library.app.Repositories.SpringJson;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,17 +14,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class Controller {
     @FXML private Button readerSearchButton;
@@ -72,21 +67,37 @@ public class Controller {
             e.printStackTrace();
         }
         readerCreateButton.setOnAction(event -> {
-            try {
-                Stage readerCreate = new Stage();
-                FXMLLoader fxmlLoader = new FXMLLoader(new File("readerCreate.fxml").toURI().toURL());
-                Scene scene = new Scene(fxmlLoader.load());
-                ((ReaderCreateController)fxmlLoader.getController()).init(readerCreate);
-
-                readerCreate.setTitle("Добавление читателя");
-                readerCreate.setScene(scene);
-                readerCreate.setResizable(false);
-                readerCreate.initModality(Modality.APPLICATION_MODAL);
-                readerCreate.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            showReaderWindow(null);
         });
+
+        setContextMenu();
+    }
+
+    private void showReaderWindow(FullReader reader) {
+        try {
+            Stage readerCreate = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("readerCreate.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            readerCreate.setTitle("Добавление читателя");
+            ((ReaderCreateController)fxmlLoader.getController()).init(readerCreate, reader);
+
+            readerCreate.setScene(scene);
+            readerCreate.setResizable(false);
+            readerCreate.initModality(Modality.APPLICATION_MODAL);
+            readerCreate.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem updateReader = new MenuItem("Редактировать");
+        updateReader.setOnAction(event -> {
+            showReaderWindow(readerTable.getSelectionModel().getSelectedItem());
+        });
+        contextMenu.getItems().add(updateReader);
+        readerTable.setContextMenu(contextMenu);
     }
 
     private void updateSearchInfo() throws IOException {
@@ -185,15 +196,22 @@ public class Controller {
         reader.setSecondName(dto.getSecondName());
         reader.setLastName(dto.getLastName());
         reader.setBirthday(dto.getBirthday());
+        reader.setId(dto.getId());
         if(dto.getClass().equals(StudentDTO.class)) {
             reader.setStudyGroup(((StudentDTO)dto).getGroup());
             reader.setFaculty(((StudentDTO)dto).getGroup().getFaculty().toString());
+            reader.setPointOfIssue(((StudentDTO) dto).getPointOfIssue());
         }
         else if(dto.getClass().equals(TeacherDTO.class)) {
             reader.setDegree(((TeacherDTO)dto).getDegree().toString());
             reader.setDepartment(((TeacherDTO)dto).getDepartment().toString());
             reader.setGrade(((TeacherDTO)dto).getGrade().toString());
             reader.setFaculty(((TeacherDTO)dto).getDepartment().getFaculty().toString());
+            reader.setPointOfIssue(((TeacherDTO) dto).getPointOfIssue());
+        }
+        else if(dto.getClass().equals(OneTimeReaderDTO.class)) {
+            reader.setPointOfIssue(((OneTimeReaderDTO)dto).getReadingRoom());
+            reader.setTakeDate(((OneTimeReaderDTO) dto).getTakeDate());
         }
     }
 
@@ -253,10 +271,12 @@ public class Controller {
         reader.setBirthday(json.getString("birthday"));
     }
 
+    @Deprecated
     private static JSONObject getForeignData(JSONObject json, String data) throws IOException {
         return readJsonFromUrl(json.getJSONObject("_links").getJSONObject(data).getString("href"));
     }
 
+    @Deprecated
     private static String readAll(java.io.Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;
@@ -266,6 +286,7 @@ public class Controller {
         return sb.toString();
     }
 
+    @Deprecated
     public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
         InputStream is = new URL(url).openStream();
         try {
