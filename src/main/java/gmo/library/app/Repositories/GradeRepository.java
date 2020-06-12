@@ -7,6 +7,8 @@ import retrofit2.http.GET;
 import java.util.List;
 
 public interface GradeRepository {
-    @GET("grades")
+    String URL = "grades";
+
+    @GET(URL)
     Call<SpringJson<List<GradeDTO>>> getAllGrades();
 }

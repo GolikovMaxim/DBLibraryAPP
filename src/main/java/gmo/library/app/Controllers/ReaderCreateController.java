@@ -1,11 +1,15 @@
 package gmo.library.app.Controllers;
 
+import com.google.gson.JsonElement;
 import gmo.library.app.DTO.*;
 import gmo.library.app.Main;
 import gmo.library.app.Repositories.SpringJson;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import okio.Buffer;
+import okio.BufferedSink;
+import org.json.JSONObject;
 import retrofit2.Response;
 
 import java.io.EOFException;
@@ -70,22 +74,32 @@ public class ReaderCreateController {
                 StudyGroupDTO studyGroupDTO = new StudyGroupDTO();
                 studyGroupDTO.setNumber(Integer.parseInt(studyGroupField.getText()));
                 studyGroupDTO.setFaculty(facultyBox.getSelectionModel().getSelectedItem());
+                if(reader != null) {
+                    studyGroupDTO.setId(reader.getStudyGroup().getId());
+                }
+
+                Response<StudyGroupDTO> studyGroup;
                 try {
-                    Main.studyGroupRepository.addStudyGroup(studyGroupDTO).execute();
+                    studyGroup = Main.studyGroupRepository.addStudyGroup(new StudyGroupDTO.StudyGroupHATEOAS(studyGroupDTO)).execute();
+                    studentDTO.setGroup(studyGroup.body());
+                    if(!studyGroup.isSuccessful()) {
+                        studentDTO.setGroup(studyGroupDTO);
+                        //Main.error("Произошла ошибка.\n" + studyGroup.toString());
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                studentDTO.setGroup(studyGroupDTO);
                 try {
                     Response<StudentDTO> response;
                     if(reader == null) {
-                        response = Main.studentRepository.createStudent(studentDTO).execute();
+                        response = Main.studentRepository.createStudent(new StudentDTO.StudentHATEOAS(studentDTO)).execute();
                     }
                     else {
-                        response = Main.studentRepository.updateStudent(reader.getId().toString(), studentDTO).execute();
+                        response = Main.studentRepository.updateStudent(reader.getId().toString(),
+                                new StudentDTO.StudentHATEOAS(studentDTO)).execute();
                     }
-                    if(reader == null && response.body() == null) {
-                        Main.error("Произошла ошибка.\n" + response.toString());
+                    if(!response.isSuccessful()) {
+                        Main.error("Произошла ошибка.\n" + response.errorBody().string());
                         return;
                     }
                     stage.close();
@@ -107,13 +121,14 @@ public class ReaderCreateController {
                 try {
                     Response<TeacherDTO> response;
                     if(reader == null) {
-                        response = Main.teacherRepository.createTeacher(teacherDTO).execute();
+                        response = Main.teacherRepository.createTeacher(new TeacherDTO.TeacherHATEOAS(teacherDTO)).execute();
                     }
                     else {
-                        response = Main.teacherRepository.updateTeacher(reader.getId().toString(), teacherDTO).execute();
+                        response = Main.teacherRepository.updateTeacher(reader.getId().toString(),
+                                new TeacherDTO.TeacherHATEOAS(teacherDTO)).execute();
                     }
-                    if(reader == null && response.body() == null) {
-                        Main.error("Произошла ошибка." + response.toString());
+                    if(!response.isSuccessful()) {
+                        Main.error("Произошла ошибка." + response.errorBody());
                         return;
                     }
                     stage.close();
@@ -137,13 +152,15 @@ public class ReaderCreateController {
                 try {
                     Response<OneTimeReaderDTO> response;
                     if(reader == null) {
-                        response = Main.oneTimeReaderRepository.createOneTimeReader(oneTimeReaderDTO).execute();
+                        response = Main.oneTimeReaderRepository.createOneTimeReader(
+                                new OneTimeReaderDTO.OneTimeReaderHATEOAS(oneTimeReaderDTO)).execute();
                     }
                     else {
-                        response = Main.oneTimeReaderRepository.updateOneTimeReader(reader.getId().toString(), oneTimeReaderDTO).execute();
+                        response = Main.oneTimeReaderRepository.updateOneTimeReader(reader.getId().toString(),
+                                new OneTimeReaderDTO.OneTimeReaderHATEOAS(oneTimeReaderDTO)).execute();
                     }
-                    if(reader == null && response.body() == null) {
-                        Main.error("Произошла ошибка." + response.toString());
+                    if(!response.isSuccessful()) {
+                        Main.error("Произошла ошибка." + response.errorBody());
                         return;
                     }
                     stage.close();

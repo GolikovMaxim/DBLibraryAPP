@@ -7,18 +7,20 @@ import retrofit2.http.*;
 import java.util.List;
 
 public interface StudentRepository {
-    @GET("students")
+    String URL = "students";
+
+    @GET(URL)
     Call<SpringJson<List<StudentDTO>>> getAllStudents();
-    @GET("students/search/findByParams")
+    @GET(URL + "/search/findByParams")
     Call<SpringJson<List<StudentDTO>>> getStudentsByParams(@Query("lastName") String lastName, @Query("firstName") String firstName,
                                                            @Query("secondName") String secondName, @Query("group") long group,
                                                            @Query("poiid") long poiid, @Query("faculty") long faculty);
-    @POST("students")
-    Call<StudentDTO> createStudent(@Body StudentDTO studentDTO);
+    @POST(URL)
+    Call<StudentDTO> createStudent(@Body StudentDTO.StudentHATEOAS studentHATEOAS);
 
-    @PATCH("students/{id}")
-    Call<StudentDTO> updateStudent(@Path("id") String id, @Body StudentDTO studentDTO);
+    @PATCH(URL + "/{id}")
+    Call<StudentDTO> updateStudent(@Path("id") String id, @Body StudentDTO.StudentHATEOAS studentHATEOAS);
 
-    @DELETE("students/{id}")
+    @DELETE(URL + "/{id}")
     Call<StudentDTO> deleteStudent(@Path("id") String id);
 }

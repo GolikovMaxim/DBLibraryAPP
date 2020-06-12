@@ -14,10 +14,10 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.File;
-
 @EnableFeignClients
 public class Main extends Application {
+    public static final String SERVER_URL = "http://localhost:8080/";
+
     public static StudentRepository studentRepository;
     public static TeacherRepository teacherRepository;
     public static OneTimeReaderRepository oneTimeReaderRepository;
@@ -47,7 +47,7 @@ public class Main extends Application {
     @SneakyThrows
     @Override
     public void start(Stage primaryStage) {
-        retrofit = new Retrofit.Builder().baseUrl("http://localhost:8080/").addConverterFactory(GsonConverterFactory.create()).build();
+        retrofit = new Retrofit.Builder().baseUrl(SERVER_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
         studentRepository = retrofit.create(StudentRepository.class);
         teacherRepository = retrofit.create(TeacherRepository.class);

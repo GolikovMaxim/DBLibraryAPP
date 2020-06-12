@@ -7,6 +7,8 @@ import retrofit2.http.GET;
 import java.util.List;
 
 public interface FacultyRepository {
-    @GET("faculties")
+    String URL = "faculties";
+
+    @GET(URL)
     Call<SpringJson<List<FacultyDTO>>> getAllFaculties();
 }

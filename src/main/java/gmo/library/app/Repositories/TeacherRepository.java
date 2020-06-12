@@ -7,18 +7,20 @@ import retrofit2.http.*;
 import java.util.List;
 
 public interface TeacherRepository {
-    @GET("teachers")
+    String URL = "teachers";
+
+    @GET(URL)
     Call<SpringJson<List<TeacherDTO>>> getAllTeachers();
-    @GET("teachers/search/findByParams")
+    @GET(URL + "/search/findByParams")
     Call<SpringJson<List<TeacherDTO>>> getTeachersByParams(@Query("lastName") String lastName, @Query("firstName") String firstName,
                                                            @Query("secondName") String secondName, @Query("department") long department,
                                                            @Query("poiid") long poiid, @Query("faculty") long faculty);
-    @POST("teachers")
-    Call<TeacherDTO> createTeacher(@Body TeacherDTO teacherDTO);
+    @POST(URL)
+    Call<TeacherDTO> createTeacher(@Body TeacherDTO.TeacherHATEOAS teacherHATEOAS);
 
-    @PATCH("teachers/{id}")
-    Call<TeacherDTO> updateTeacher(@Path("id") String id, @Body TeacherDTO teacherDTO);
+    @PATCH(URL + "/{id}")
+    Call<TeacherDTO> updateTeacher(@Path("id") String id, @Body TeacherDTO.TeacherHATEOAS teacherHATEOAS);
 
-    @DELETE("teachers/{id}")
+    @DELETE(URL + "/{id}")
     Call<TeacherDTO> deleteTeacher(@Path("id") String id);
 }

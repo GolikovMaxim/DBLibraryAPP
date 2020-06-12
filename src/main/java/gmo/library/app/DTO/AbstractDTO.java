@@ -12,4 +12,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 public abstract class AbstractDTO<ID extends Serializable> implements Serializable {
     private ID id;
+
+    @Getter @Setter
+    @NoArgsConstructor
+    public static abstract class AbstractHATEOAS<ID extends Serializable> implements Serializable {
+        private ID id;
+
+        public AbstractHATEOAS(AbstractDTO<ID> abstractDTO) {
+            id = abstractDTO.id;
+        }
+    }
 }

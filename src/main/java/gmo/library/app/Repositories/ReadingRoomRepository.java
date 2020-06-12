@@ -7,6 +7,8 @@ import retrofit2.http.GET;
 import java.util.List;
 
 public interface ReadingRoomRepository {
-    @GET("readingRooms")
+    String URL = "readingRooms";
+
+    @GET(URL)
     Call<SpringJson<List<ReadingRoomDTO>>> getAllReadingRooms();
 }
