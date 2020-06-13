@@ -9,6 +9,8 @@ import lombok.Setter;
 @Getter @Setter
 @NoArgsConstructor
 public class StudentDTO extends ReaderDTO {
+    public static final Sort SORT_BY_STUDYGROUP = new Sort("По группе", "group");
+
     private StudyGroupDTO group;
     private PointOfIssueDTO pointOfIssue;
 

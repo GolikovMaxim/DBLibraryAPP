@@ -14,7 +14,7 @@ public interface OneTimeReaderRepository {
     @GET(URL + "/search/findByParams")
     Call<SpringJson<List<OneTimeReaderDTO>>> getOneTimeReadersByParams(@Query("lastName") String lastName, @Query("firstName") String firstName,
                                                                        @Query("secondName") String secondName, @Query("poiid") long poiid,
-                                                                       @Query("size") int size, @Query("page") int page);
+                                                                       @Query("size") int size, @Query("page") int page, @Query("sort") String sort);
     @POST(URL)
     Call<OneTimeReaderDTO> createOneTimeReader(@Body OneTimeReaderDTO.OneTimeReaderHATEOAS oneTimeReaderHATEOAS);
 

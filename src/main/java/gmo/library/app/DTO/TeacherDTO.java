@@ -12,6 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeacherDTO extends ReaderDTO {
+    public static final Sort SORT_BY_DEPARTMENT = new Sort("По кафедре", "department");
+    public static final Sort SORT_BY_DEGREE = new Sort("По степени", "degree");
+    public static final Sort SORT_BY_GRADE = new Sort("По званию", "grade");
+
     private DepartmentDTO department;
     private DegreeDTO degree;
     private GradeDTO grade;

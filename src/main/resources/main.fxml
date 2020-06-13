@@ -18,11 +18,11 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <ComboBox fx:id="pointOfIssueBox" layoutX="16.0" layoutY="15.0" prefHeight="25.0" prefWidth="180.0" promptText="Пункт выдачи" />
-                  <ComboBox fx:id="departmentBox" layoutX="212.0" layoutY="15.0" prefWidth="180.0" promptText="Кафедра" />
-                  <ComboBox fx:id="facultyBox" layoutX="408.0" layoutY="15.0" prefWidth="180.0" promptText="Факультет" />
-                  <ComboBox fx:id="groupBox" layoutX="604.0" layoutY="15.0" prefWidth="180.0" promptText="Группа" />
-                  <TextField fx:id="fullNameField" layoutX="16.0" layoutY="55.0" prefWidth="376.0" promptText="ФИО читателя" />
+                  <ComboBox fx:id="readerPointOfIssueBox" layoutX="16.0" layoutY="15.0" prefHeight="25.0" prefWidth="180.0" promptText="Пункт выдачи" />
+                  <ComboBox fx:id="readerDepartmentBox" layoutX="212.0" layoutY="15.0" prefWidth="180.0" promptText="Кафедра" />
+                  <ComboBox fx:id="readerFacultyBox" layoutX="408.0" layoutY="15.0" prefWidth="180.0" promptText="Факультет" />
+                  <ComboBox fx:id="readerGroupBox" layoutX="604.0" layoutY="15.0" prefWidth="180.0" promptText="Группа" />
+                  <TextField fx:id="readerFullNameField" layoutX="16.0" layoutY="55.0" prefWidth="376.0" promptText="ФИО читателя" />
                   <Button fx:id="readerSearchButton" layoutX="604.0" layoutY="55.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="180.0" text="Поиск" />
                   <TableView fx:id="readerTable" layoutX="16.0" layoutY="95.0" prefHeight="430.0" prefWidth="768.0">
                     <columns>
@@ -35,14 +35,16 @@
                         <TableColumn fx:id="readerColumnGrade" prefWidth="86.0" text="Звание" />
                     </columns>
                   </TableView>
-                  <Button fx:id="readerCreateButton" layoutX="408.0" layoutY="55.0" mnemonicParsing="false" prefWidth="180.0" style="-fx-text-fill: #00f;" text="Добавить читателя" />
-                  <ChoiceBox fx:id="pageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
-                  <TextField fx:id="pageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
-                  <Label fx:id="totalPagesLabel" layoutX="75.0" layoutY="537.0">
+                  <Button fx:id="readerCreateButton" layoutX="568.0" layoutY="535.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" style="-fx-text-fill: #00f;" text="Добавить читателя" />
+                  <ChoiceBox fx:id="readerPageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
+                  <TextField fx:id="readerPageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
+                  <Label fx:id="readerTotalPagesLabel" layoutX="75.0" layoutY="537.0" text="/ 10">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
+                  <ChoiceBox fx:id="readerSortBox" layoutX="130.0" layoutY="535.0" prefHeight="25.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="readerSortOrderBox" layoutX="296.0" layoutY="535.0" prefHeight="25.0" prefWidth="150.0" />
                </children></AnchorPane>
       </content>
     </Tab>

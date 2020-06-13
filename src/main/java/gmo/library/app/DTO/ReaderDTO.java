@@ -9,6 +9,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class ReaderDTO extends AbstractDTO<Long> {
+    public static final Sort SORT_BY_FIRSTNAME = new Sort("По имени", "firstName");
+    public static final Sort SORT_BY_SECONDNAME = new Sort("По отчеству", "secondName");
+    public static final Sort SORT_BY_LASTNAME = new Sort("По фамилии", "lastName");
+
     private String firstName;
     private String secondName;
     private String lastName;

@@ -25,11 +25,11 @@ public class Controller {
     @FXML private Button readerSearchButton;
     @FXML private Button readerCreateButton;
     //данные для поиска
-    @FXML private ComboBox<PointOfIssueDTO> pointOfIssueBox;
-    @FXML private ComboBox<DepartmentDTO> departmentBox;
-    @FXML private ComboBox<FacultyDTO> facultyBox;
-    @FXML private ComboBox<StudyGroupDTO> groupBox;
-    @FXML private TextField fullNameField;
+    @FXML private ComboBox<PointOfIssueDTO> readerPointOfIssueBox;
+    @FXML private ComboBox<DepartmentDTO> readerDepartmentBox;
+    @FXML private ComboBox<FacultyDTO> readerFacultyBox;
+    @FXML private ComboBox<StudyGroupDTO> readerGroupBox;
+    @FXML private TextField readerFullNameField;
     //таблица
     @FXML private TableView<FullReader> readerTable;
     @FXML private TableColumn<FullReader, String> readerColumnName;
@@ -40,9 +40,11 @@ public class Controller {
     @FXML private TableColumn<FullReader, String> readerColumnDegree;
     @FXML private TableColumn<FullReader, String> readerColumnGrade;
     //страницы
-    @FXML private TextField pageNumberField;
-    @FXML private Label totalPagesLabel;
-    @FXML private ChoiceBox<Integer> pageSizeBox;
+    @FXML private TextField readerPageNumberField;
+    @FXML private Label readerTotalPagesLabel;
+    @FXML private ChoiceBox<Integer> readerPageSizeBox;
+    @FXML private ChoiceBox<Sort> readerSortBox;
+    @FXML private ChoiceBox<Sort> readerSortOrderBox;
 
     private int totalPages = 1;
 
@@ -78,10 +80,14 @@ public class Controller {
 
         setContextMenu();
 
-        pageSizeBox.getItems().addAll(30, 90, 300);
-        pageSizeBox.getSelectionModel().select(0);
-        pageNumberField.setText("" + 1);
-        totalPagesLabel.setText("/ " + totalPages);
+        readerPageSizeBox.getItems().addAll(30, 90, 300);
+        readerPageSizeBox.getSelectionModel().select(0);
+        readerPageNumberField.setText("" + 1);
+        readerTotalPagesLabel.setText("/ " + totalPages);
+        readerSortBox.getItems().addAll(Sort.EMPTY, ReaderDTO.SORT_BY_LASTNAME, ReaderDTO.SORT_BY_FIRSTNAME, ReaderDTO.SORT_BY_SECONDNAME);
+        readerSortBox.getSelectionModel().select(0);
+        readerSortOrderBox.getItems().addAll(Sort.DESCENDING, Sort.ASCENDING);
+        readerSortOrderBox.getSelectionModel().select(0);
     }
 
     private void showReaderWindow(FullReader reader) {
@@ -112,15 +118,15 @@ public class Controller {
     }
 
     public void updateSearchInfo() throws IOException {
-        updatePointOfIssues(pointOfIssueBox, true);
-        updateDepartments(departmentBox, true);
-        updateFaculties(facultyBox, true);
+        updatePointOfIssues(readerPointOfIssueBox, true);
+        updateDepartments(readerDepartmentBox, true);
+        updateFaculties(readerFacultyBox, true);
 
         Response<SpringJson<List<StudyGroupDTO>>> studyGroups = Main.studyGroupRepository.getAllStudyGroups().execute();
-        groupBox.getItems().clear();
-        groupBox.getItems().add(null);
-        groupBox.getSelectionModel().selectFirst();
-        groupBox.getItems().addAll(studyGroups.body().getContent());
+        readerGroupBox.getItems().clear();
+        readerGroupBox.getItems().add(null);
+        readerGroupBox.getSelectionModel().selectFirst();
+        readerGroupBox.getItems().addAll(studyGroups.body().getContent());
     }
 
     public static void updateDepartments(ComboBox<DepartmentDTO> departmentBox, boolean addNull) throws IOException {
@@ -155,11 +161,11 @@ public class Controller {
     }
 
     public void fillReaderTableByRetrofit() throws IOException {
-        StudyGroupDTO studyGroupDTO = groupBox.getSelectionModel().getSelectedItem();
-        PointOfIssueDTO pointOfIssueDTO = pointOfIssueBox.getSelectionModel().getSelectedItem();
-        DepartmentDTO departmentDTO = departmentBox.getSelectionModel().getSelectedItem();
-        FacultyDTO facultyDTO = facultyBox.getSelectionModel().getSelectedItem();
-        String[] nameArray = fullNameField.getText().split(" ");
+        StudyGroupDTO studyGroupDTO = readerGroupBox.getSelectionModel().getSelectedItem();
+        PointOfIssueDTO pointOfIssueDTO = readerPointOfIssueBox.getSelectionModel().getSelectedItem();
+        DepartmentDTO departmentDTO = readerDepartmentBox.getSelectionModel().getSelectedItem();
+        FacultyDTO facultyDTO = readerFacultyBox.getSelectionModel().getSelectedItem();
+        String[] nameArray = readerFullNameField.getText().split(" ");
         List<String> nameList = new ArrayList<>();
         for(int i = 0; i < 3; i++) {
             try {
@@ -172,7 +178,7 @@ public class Controller {
 
         int pageNumber = 1;
         try {
-            pageNumber = Integer.parseInt(pageNumberField.getText());
+            pageNumber = Integer.parseInt(readerPageNumberField.getText());
             if(pageNumber < 1 || pageNumber > totalPages) {
                 throw new NumberFormatException();
             }
@@ -187,17 +193,18 @@ public class Controller {
                 ((studyGroupDTO == null && departmentDTO == null && facultyDTO == null) ? 1 : 0);
 
         readerTable.getItems().clear();
-        totalPagesLabel.setText("");
+        readerTotalPagesLabel.setText("");
 
         totalPages = 1;
 
-        System.out.println(pageNumber - 1 + " " + pageSizeBox.getValue() / typeCount);
+        System.out.println(pageNumber - 1 + " " + readerPageSizeBox.getValue() / typeCount);
 
         if(departmentDTO == null) {
             Response<SpringJson<List<StudentDTO>>> students = Main.studentRepository.getStudentsByParams(
                     nameList.get(0), nameList.get(1), nameList.get(2), studyGroupDTO == null ? 0 : studyGroupDTO.getId(),
                     pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId(),
-                    pageSizeBox.getValue() / typeCount, pageNumber - 1).execute();
+                    readerPageSizeBox.getValue() / typeCount, pageNumber - 1,
+                    readerSortBox.getValue().getValue() + "," + readerSortOrderBox.getValue().getValue()).execute();
             processReaders(students.body().getContent());
             if(students.body().getPage().getTotalPages() > totalPages) {
                 totalPages = students.body().getPage().getTotalPages();
@@ -207,7 +214,8 @@ public class Controller {
             Response<SpringJson<List<TeacherDTO>>> teachers = Main.teacherRepository.getTeachersByParams(
                     nameList.get(0), nameList.get(1), nameList.get(2), departmentDTO == null ? 0 : departmentDTO.getId(),
                     pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId(),
-                    pageSizeBox.getValue() / typeCount, pageNumber - 1).execute();
+                    readerPageSizeBox.getValue() / typeCount, pageNumber - 1,
+                    readerSortBox.getValue().getValue() + "," + readerSortOrderBox.getValue().getValue()).execute();
             processReaders(teachers.body().getContent());
             if(teachers.body().getPage().getTotalPages() > totalPages) {
                 totalPages = teachers.body().getPage().getTotalPages();
@@ -216,14 +224,15 @@ public class Controller {
         if(studyGroupDTO == null && departmentDTO == null && facultyDTO == null) {
             Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = Main.oneTimeReaderRepository.getOneTimeReadersByParams(
                     nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(),
-                    pageSizeBox.getValue() / typeCount, pageNumber - 1).execute();
+                    readerPageSizeBox.getValue() / typeCount, pageNumber - 1,
+                    readerSortBox.getValue().getValue() + "," + readerSortOrderBox.getValue().getValue()).execute();
             processReaders(oneTimeReaders.body().getContent());
             if(oneTimeReaders.body().getPage().getTotalPages() > totalPages) {
                 totalPages = oneTimeReaders.body().getPage().getTotalPages();
             }
         }
 
-        totalPagesLabel.setText("/ " + totalPages);
+        readerTotalPagesLabel.setText("/ " + totalPages);
     }
 
     private <T extends ReaderDTO> void processReaders(List<T> readers) {
