@@ -26,7 +26,9 @@ public class StudyGroupDTO extends AbstractDTO<Long> {
         public StudyGroupHATEOAS(StudyGroupDTO studyGroupDTO) {
             super(studyGroupDTO);
             number = studyGroupDTO.number;
-            faculty = studyGroupDTO.faculty.getURL();
+            if(studyGroupDTO.faculty != null) {
+                faculty = studyGroupDTO.faculty.getURL();
+            }
         }
     }
 

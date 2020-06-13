@@ -48,7 +48,7 @@ public class ReaderCreateController {
 
     }
 
-    public void init(Stage stage, FullReader reader) throws IOException {
+    public void init(Stage stage, FullReader reader, Controller controller) throws IOException {
         updateBoxesInfo();
         if(reader != null) {
             stage.setTitle("Изменение читателя");
@@ -71,24 +71,32 @@ public class ReaderCreateController {
                 StudentDTO studentDTO = new StudentDTO();
                 setCommonFields(studentDTO);
                 studentDTO.setPointOfIssue(studentPointOfIssueBox.getValue());
-                StudyGroupDTO studyGroupDTO = new StudyGroupDTO();
-                studyGroupDTO.setNumber(Integer.parseInt(studyGroupField.getText()));
-                studyGroupDTO.setFaculty(facultyBox.getSelectionModel().getSelectedItem());
-                if(reader != null) {
-                    studyGroupDTO.setId(reader.getStudyGroup().getId());
-                }
 
-                Response<StudyGroupDTO> studyGroup;
+                StudyGroupDTO studyGroupDTO = null;
                 try {
-                    studyGroup = Main.studyGroupRepository.addStudyGroup(new StudyGroupDTO.StudyGroupHATEOAS(studyGroupDTO)).execute();
-                    studentDTO.setGroup(studyGroup.body());
-                    if(!studyGroup.isSuccessful()) {
-                        studentDTO.setGroup(studyGroupDTO);
-                        //Main.error("Произошла ошибка.\n" + studyGroup.toString());
-                    }
-                } catch (IOException e) {
+                    studyGroupDTO = Main.studyGroupRepository.getGroupByNumber(
+                            Integer.parseInt(studyGroupField.getText())).execute().body();
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
+                if(studyGroupDTO == null) {
+                    Response<StudyGroupDTO> studyGroup;
+                    try {
+                        studyGroupDTO = new StudyGroupDTO();
+                        studyGroupDTO.setNumber(Integer.parseInt(studyGroupField.getText()));
+                        studyGroupDTO.setFaculty(facultyBox.getValue());
+                        studyGroup = Main.studyGroupRepository.addStudyGroup(new StudyGroupDTO.StudyGroupHATEOAS(studyGroupDTO)).execute();
+                        studentDTO.setGroup(studyGroup.body());
+                        controller.updateSearchInfo();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    studentDTO.setGroup(studyGroupDTO);
+                }
+
                 try {
                     Response<StudentDTO> response;
                     if(reader == null) {
@@ -171,6 +179,11 @@ public class ReaderCreateController {
                 catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+            try {
+                controller.fillReaderTableByRetrofit();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }

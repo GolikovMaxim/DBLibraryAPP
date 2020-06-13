@@ -39,6 +39,12 @@ public class Controller {
     @FXML private TableColumn<FullReader, String> readerColumnDepartment;
     @FXML private TableColumn<FullReader, String> readerColumnDegree;
     @FXML private TableColumn<FullReader, String> readerColumnGrade;
+    //страницы
+    @FXML private TextField pageNumberField;
+    @FXML private Label totalPagesLabel;
+    @FXML private ChoiceBox<Integer> pageSizeBox;
+
+    private int totalPages = 1;
 
     public Controller() {
 
@@ -71,6 +77,11 @@ public class Controller {
         });
 
         setContextMenu();
+
+        pageSizeBox.getItems().addAll(30, 90, 300);
+        pageSizeBox.getSelectionModel().select(0);
+        pageNumberField.setText("" + 1);
+        totalPagesLabel.setText("/ " + totalPages);
     }
 
     private void showReaderWindow(FullReader reader) {
@@ -79,7 +90,7 @@ public class Controller {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("readerCreate.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             readerCreate.setTitle("Добавление читателя");
-            ((ReaderCreateController)fxmlLoader.getController()).init(readerCreate, reader);
+            ((ReaderCreateController)fxmlLoader.getController()).init(readerCreate, reader, this);
 
             readerCreate.setScene(scene);
             readerCreate.setResizable(false);
@@ -100,7 +111,7 @@ public class Controller {
         readerTable.setContextMenu(contextMenu);
     }
 
-    private void updateSearchInfo() throws IOException {
+    public void updateSearchInfo() throws IOException {
         updatePointOfIssues(pointOfIssueBox, true);
         updateDepartments(departmentBox, true);
         updateFaculties(facultyBox, true);
@@ -143,7 +154,7 @@ public class Controller {
         box.getSelectionModel().selectFirst();
     }
 
-    private void fillReaderTableByRetrofit() throws IOException {
+    public void fillReaderTableByRetrofit() throws IOException {
         StudyGroupDTO studyGroupDTO = groupBox.getSelectionModel().getSelectedItem();
         PointOfIssueDTO pointOfIssueDTO = pointOfIssueBox.getSelectionModel().getSelectedItem();
         DepartmentDTO departmentDTO = departmentBox.getSelectionModel().getSelectedItem();
@@ -159,25 +170,60 @@ public class Controller {
             }
         }
 
+        int pageNumber = 1;
+        try {
+            pageNumber = Integer.parseInt(pageNumberField.getText());
+            if(pageNumber < 1 || pageNumber > totalPages) {
+                throw new NumberFormatException();
+            }
+        }
+        catch (NumberFormatException nfe) {
+            Main.error("Введите верный номер страницы.\n" +
+                    "Номер должен быть от единицы до количества страниц.");
+            return;
+        }
+
+        int typeCount = (departmentDTO == null ? 1 : 0) + (studyGroupDTO == null ? 1 : 0) +
+                ((studyGroupDTO == null && departmentDTO == null && facultyDTO == null) ? 1 : 0);
+
         readerTable.getItems().clear();
+        totalPagesLabel.setText("");
+
+        totalPages = 1;
+
+        System.out.println(pageNumber - 1 + " " + pageSizeBox.getValue() / typeCount);
 
         if(departmentDTO == null) {
             Response<SpringJson<List<StudentDTO>>> students = Main.studentRepository.getStudentsByParams(
                     nameList.get(0), nameList.get(1), nameList.get(2), studyGroupDTO == null ? 0 : studyGroupDTO.getId(),
-                    pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
+                    pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId(),
+                    pageSizeBox.getValue() / typeCount, pageNumber - 1).execute();
             processReaders(students.body().getContent());
+            if(students.body().getPage().getTotalPages() > totalPages) {
+                totalPages = students.body().getPage().getTotalPages();
+            }
         }
         if(studyGroupDTO == null) {
             Response<SpringJson<List<TeacherDTO>>> teachers = Main.teacherRepository.getTeachersByParams(
                     nameList.get(0), nameList.get(1), nameList.get(2), departmentDTO == null ? 0 : departmentDTO.getId(),
-                    pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId()).execute();
+                    pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId(),
+                    pageSizeBox.getValue() / typeCount, pageNumber - 1).execute();
             processReaders(teachers.body().getContent());
+            if(teachers.body().getPage().getTotalPages() > totalPages) {
+                totalPages = teachers.body().getPage().getTotalPages();
+            }
         }
         if(studyGroupDTO == null && departmentDTO == null && facultyDTO == null) {
             Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = Main.oneTimeReaderRepository.getOneTimeReadersByParams(
-                    nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId()).execute();
+                    nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(),
+                    pageSizeBox.getValue() / typeCount, pageNumber - 1).execute();
             processReaders(oneTimeReaders.body().getContent());
+            if(oneTimeReaders.body().getPage().getTotalPages() > totalPages) {
+                totalPages = oneTimeReaders.body().getPage().getTotalPages();
+            }
         }
+
+        totalPagesLabel.setText("/ " + totalPages);
     }
 
     private <T extends ReaderDTO> void processReaders(List<T> readers) {

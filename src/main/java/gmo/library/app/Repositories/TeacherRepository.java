@@ -14,7 +14,8 @@ public interface TeacherRepository {
     @GET(URL + "/search/findByParams")
     Call<SpringJson<List<TeacherDTO>>> getTeachersByParams(@Query("lastName") String lastName, @Query("firstName") String firstName,
                                                            @Query("secondName") String secondName, @Query("department") long department,
-                                                           @Query("poiid") long poiid, @Query("faculty") long faculty);
+                                                           @Query("poiid") long poiid, @Query("faculty") long faculty,
+                                                           @Query("size") int size, @Query("page") int page);
     @POST(URL)
     Call<TeacherDTO> createTeacher(@Body TeacherDTO.TeacherHATEOAS teacherHATEOAS);
 
