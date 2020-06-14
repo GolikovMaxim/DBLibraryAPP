@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.Getter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +22,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class Controller {
+    //
+    //читатели
+    //
     @FXML private Button readerSearchButton;
     @FXML private Button readerCreateButton;
     //данные для поиска
@@ -45,6 +50,27 @@ public class Controller {
     @FXML private ChoiceBox<Integer> readerPageSizeBox;
     @FXML private ChoiceBox<Sort> readerSortBox;
     @FXML private ChoiceBox<Sort> readerSortOrderBox;
+    //
+    //издания
+    //
+    @FXML private TextField issueBookNameField;
+    @FXML private ComboBox<FileCabinetDTO> issueFileCabinetBox;
+    @FXML private Button issueSearchButton;
+    @FXML private Button issueCreateButton;
+    //таблица
+    @FXML private TableView<IssueDTO> issueTable;
+    @FXML private TableColumn<IssueDTO, String> issueColumnName;
+    @FXML private TableColumn<IssueDTO, String> issueColumnFileCabinet;
+    @FXML private TableColumn<IssueDTO, String> issueColumnPointOfIssue;
+    @FXML private TableColumn<IssueDTO, String> issueColumnReceiptDate;
+    @FXML private TableColumn<IssueDTO, String> issueColumnBookCount;
+    @FXML private TableColumn<IssueDTO, String> issueColumnBooksInStock;
+    //страницы
+    @FXML private TextField issuePageNumberField;
+    @FXML private Label issueTotalPagesLabel;
+    @FXML private ChoiceBox<Sort> issueSortBox;
+    @FXML private ChoiceBox<Sort> issueSortOrderBox;
+    @FXML private ChoiceBox<Integer> issuePageSizeBox;
 
     private int totalPages = 1;
 
@@ -53,10 +79,11 @@ public class Controller {
     }
 
     public void init() {
-        readerColumnName.setCellValueFactory(cellData -> new SimpleStringProperty(
+        readerColumnName.setCellValueFactory(cellData -> new SimpleStringProperty("" +
                 cellData.getValue().getLastName() + " " + cellData.getValue().getFirstName() + " " + cellData.getValue().getSecondName()));
         readerColumnBirthday.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBirthday()));
-        readerColumnGroup.setCellValueFactory(cellData -> new SimpleStringProperty("" + (cellData.getValue().getStudyGroup() == null ? "" : cellData.getValue().getStudyGroup())));
+        readerColumnGroup.setCellValueFactory(cellData -> new SimpleStringProperty("" +
+                (cellData.getValue().getStudyGroup() == null ? "" : cellData.getValue().getStudyGroup())));
         readerColumnFaculty.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFaculty()));
         readerColumnDepartment.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDepartment()));
         readerColumnDegree.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDegree()));
@@ -78,16 +105,15 @@ public class Controller {
             showReaderWindow(null);
         });
 
-        setContextMenu();
+        readerTable.setContextMenu(setContextMenu(() -> {
+            showReaderWindow(readerTable.getSelectionModel().getSelectedItem());
+        }));
 
-        readerPageSizeBox.getItems().addAll(30, 90, 300);
-        readerPageSizeBox.getSelectionModel().select(0);
-        readerPageNumberField.setText("" + 1);
-        readerTotalPagesLabel.setText("/ " + totalPages);
+        initPagingAndSorting(readerPageSizeBox, readerPageNumberField, readerTotalPagesLabel, readerSortOrderBox, totalPages);
         readerSortBox.getItems().addAll(Sort.EMPTY, ReaderDTO.SORT_BY_LASTNAME, ReaderDTO.SORT_BY_FIRSTNAME, ReaderDTO.SORT_BY_SECONDNAME);
         readerSortBox.getSelectionModel().select(0);
-        readerSortOrderBox.getItems().addAll(Sort.DESCENDING, Sort.ASCENDING);
-        readerSortOrderBox.getSelectionModel().select(0);
+
+        IssueController issueController = new IssueController(this);
     }
 
     private void showReaderWindow(FullReader reader) {
@@ -107,14 +133,21 @@ public class Controller {
         }
     }
 
-    private void setContextMenu() {
+    public static void initPagingAndSorting(ChoiceBox<Integer> pageSizeBox, TextField pageNumberField, Label totalPagesLabel, ChoiceBox<Sort> sortOrderBox, int totalPages) {
+        pageSizeBox.getItems().addAll(30, 90, 300);
+        pageSizeBox.getSelectionModel().select(0);
+        pageNumberField.setText("" + 1);
+        totalPagesLabel.setText("/ " + totalPages);
+        sortOrderBox.getItems().addAll(Sort.DESCENDING, Sort.ASCENDING);
+        sortOrderBox.getSelectionModel().select(0);
+    }
+
+    public static ContextMenu setContextMenu(Runnable runnable) {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem updateReader = new MenuItem("Редактировать");
-        updateReader.setOnAction(event -> {
-            showReaderWindow(readerTable.getSelectionModel().getSelectedItem());
-        });
+        updateReader.setOnAction(event -> runnable.run());
         contextMenu.getItems().add(updateReader);
-        readerTable.setContextMenu(contextMenu);
+        return contextMenu;
     }
 
     public void updateSearchInfo() throws IOException {
@@ -137,6 +170,11 @@ public class Controller {
     public static void updateFaculties(ComboBox<FacultyDTO> facultyBox, boolean addNull) throws IOException {
         Response<SpringJson<List<FacultyDTO>>> faculties = Main.facultyRepository.getAllFaculties().execute();
         update(facultyBox, faculties.body().getContent(), addNull);
+    }
+
+    public static void updateFileCabinets(ComboBox<FileCabinetDTO> fileCabinetBox, boolean addNull) throws IOException {
+        Response<SpringJson<List<FileCabinetDTO>>> fileCabinets = Main.fileCabinetRepository.getAllFileCabinets().execute();
+        update(fileCabinetBox, fileCabinets.body().getContent(), addNull);
     }
 
     public static void updatePointOfIssues(ComboBox<PointOfIssueDTO> pointOfIssueBox, boolean addNull) throws IOException {
@@ -176,7 +214,7 @@ public class Controller {
             }
         }
 
-        int pageNumber = 1;
+        int pageNumber;
         try {
             pageNumber = Integer.parseInt(readerPageNumberField.getText());
             if(pageNumber < 1 || pageNumber > totalPages) {
@@ -196,8 +234,6 @@ public class Controller {
         readerTotalPagesLabel.setText("");
 
         totalPages = 1;
-
-        System.out.println(pageNumber - 1 + " " + readerPageSizeBox.getValue() / typeCount);
 
         if(departmentDTO == null) {
             Response<SpringJson<List<StudentDTO>>> students = Main.studentRepository.getStudentsByParams(

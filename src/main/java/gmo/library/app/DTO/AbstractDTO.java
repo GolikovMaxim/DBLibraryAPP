@@ -22,4 +22,9 @@ public abstract class AbstractDTO<ID extends Serializable> implements Serializab
             id = abstractDTO.id;
         }
     }
+
+    @Override
+    public String toString() {
+        return id.toString();
+    }
 }

@@ -15,12 +15,12 @@ public interface OneTimeReaderRepository {
     Call<SpringJson<List<OneTimeReaderDTO>>> getOneTimeReadersByParams(@Query("lastName") String lastName, @Query("firstName") String firstName,
                                                                        @Query("secondName") String secondName, @Query("poiid") long poiid,
                                                                        @Query("size") int size, @Query("page") int page, @Query("sort") String sort);
-    @POST(URL)
+    @POST(URL) @Headers("Accept: */*")
     Call<OneTimeReaderDTO> createOneTimeReader(@Body OneTimeReaderDTO.OneTimeReaderHATEOAS oneTimeReaderHATEOAS);
 
-    @PATCH(URL + "/{id}")
+    @PATCH(URL + "/{id}") @Headers("Accept: */*")
     Call<OneTimeReaderDTO> updateOneTimeReader(@Path("id") String id, @Body OneTimeReaderDTO.OneTimeReaderHATEOAS oneTimeReaderHATEOAS);
 
-    @DELETE(URL + "/{id}")
+    @DELETE(URL + "/{id}") @Headers("Accept: */*")
     Call<OneTimeReaderDTO> deleteOneTimeReader(@Path("id") String id);
 }

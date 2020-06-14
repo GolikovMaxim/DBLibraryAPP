@@ -32,6 +32,9 @@ public class Main extends Application {
 
     public static StudyGroupRepository studyGroupRepository;
 
+    public static IssueRepository issueRepository;
+    public static FileCabinetRepository fileCabinetRepository;
+
     private Retrofit retrofit;
 
     public static void main(String[] args) {
@@ -62,6 +65,9 @@ public class Main extends Application {
         gradeRepository = retrofit.create(GradeRepository.class);
 
         studyGroupRepository = retrofit.create(StudyGroupRepository.class);
+
+        issueRepository = retrofit.create(IssueRepository.class);
+        fileCabinetRepository = retrofit.create(FileCabinetRepository.class);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("main.fxml"));
         Scene scene = new Scene(fxmlLoader.load());

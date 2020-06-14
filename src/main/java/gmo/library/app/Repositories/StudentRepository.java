@@ -16,12 +16,12 @@ public interface StudentRepository {
                                                            @Query("secondName") String secondName, @Query("group") long group,
                                                            @Query("poiid") long poiid, @Query("faculty") long faculty,
                                                            @Query("size") int size, @Query("page") int page, @Query("sort") String sort);
-    @POST(URL)
+    @POST(URL) @Headers("Accept: */*")
     Call<StudentDTO> createStudent(@Body StudentDTO.StudentHATEOAS studentHATEOAS);
 
-    @PATCH(URL + "/{id}")
+    @PATCH(URL + "/{id}") @Headers("Accept: */*")
     Call<StudentDTO> updateStudent(@Path("id") String id, @Body StudentDTO.StudentHATEOAS studentHATEOAS);
 
-    @DELETE(URL + "/{id}")
+    @DELETE(URL + "/{id}") @Headers("Accept: */*")
     Call<StudentDTO> deleteStudent(@Path("id") String id);
 }

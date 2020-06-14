@@ -35,7 +35,7 @@
                         <TableColumn fx:id="readerColumnGrade" prefWidth="86.0" text="Звание" />
                     </columns>
                   </TableView>
-                  <Button fx:id="readerCreateButton" layoutX="568.0" layoutY="535.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" style="-fx-text-fill: #00f;" text="Добавить читателя" />
+                  <Button fx:id="readerCreateButton" layoutX="568.0" layoutY="535.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" text="Добавить читателя" textFill="BLUE" />
                   <ChoiceBox fx:id="readerPageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
                   <TextField fx:id="readerPageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
                   <Label fx:id="readerTotalPagesLabel" layoutX="75.0" layoutY="537.0" text="/ 10">
@@ -50,7 +50,32 @@
     </Tab>
     <Tab text="Издания">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TableView fx:id="issueTable" layoutX="16.0" layoutY="55.0" prefHeight="470.0" prefWidth="768.0">
+                    <columns>
+                      <TableColumn fx:id="issueColumnName" prefWidth="199.0" text="Название книги" />
+                      <TableColumn fx:id="issueColumnFileCabinet" minWidth="0.0" prefWidth="85.0" text="Картотека" />
+                        <TableColumn fx:id="issueColumnPointOfIssue" minWidth="0.0" prefWidth="100.0" text="Пункт выдачи" />
+                        <TableColumn fx:id="issueColumnReceiptDate" minWidth="0.0" prefWidth="124.0" text="Дата получения" />
+                        <TableColumn fx:id="issueColumnBookCount" minWidth="0.0" prefWidth="125.0" text="Количество книг" />
+                        <TableColumn fx:id="issueColumnBooksInStock" minWidth="0.0" prefWidth="116.0" text="Книг в наличии" />
+                    </columns>
+                  </TableView>
+                  <TextField fx:id="issueBookNameField" layoutX="16.0" layoutY="15.0" prefHeight="25.0" prefWidth="376.0" promptText="Название книги" />
+                  <Button fx:id="issueSearchButton" layoutX="604.0" layoutY="15.0" mnemonicParsing="false" prefWidth="180.0" text="Поиск" />
+                  <ComboBox fx:id="issueFileCabinetBox" layoutX="408.0" layoutY="15.0" prefWidth="180.0" promptText="Картотека" />
+                  <TextField fx:id="issuePageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
+                  <Label fx:id="issueTotalPagesLabel" layoutX="75.0" layoutY="537.0" text="/ 10">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="issueSortBox" layoutX="130.0" layoutY="535.0" prefHeight="25.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="issueSortOrderBox" layoutX="296.0" layoutY="535.0" prefHeight="25.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="issuePageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
+                  <Button fx:id="issueCreateButton" layoutX="568.0" layoutY="535.0" mnemonicParsing="false" prefWidth="130.0" text="Добавить издание" textFill="BLUE" />
+               </children></AnchorPane>
       </content>
     </Tab>
       <Tab text="Untitled Tab 2">
