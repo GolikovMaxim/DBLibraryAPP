@@ -87,6 +87,10 @@ public class BookTakeCreateController {
                 Main.error("Заполните все поля.");
                 return;
             }
+            if(takeDatePicker.getValue().isAfter(returnDatePicker.getValue())) {
+                Main.error("Дата возврата должна быть после даты взятия.");
+                return;
+            }
 
             BookTakeDTO bookTake = new BookTakeDTO();
             bookTake.setIssue(issueTable.getSelectionModel().getSelectedItem());
