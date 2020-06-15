@@ -7,6 +7,7 @@ import gmo.library.app.Main;
 import gmo.library.app.Repositories.SpringJson;
 import gmo.library.app.Utilities.Sort;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.MenuItem;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -58,6 +59,11 @@ public class OffenceController {
         controller.getOffenceTable().setContextMenu(Controller.setContextMenu(() -> {
             OffenceCreateController.showOffenceCreateWindow(null, controller.getOffenceTable().getSelectionModel().getSelectedItem());
         }));
+        MenuItem menuItem = new MenuItem("Назначить штраф");
+        menuItem.setOnAction(event -> {
+            PenaltyCreateController.showPenaltyCreateWindow(controller.getOffenceTable().getSelectionModel().getSelectedItem(), null);
+        });
+        controller.getOffenceTable().getContextMenu().getItems().add(menuItem);
     }
 
     public void fillOffenceTableByRetrofit() throws IOException {
@@ -87,7 +93,9 @@ public class OffenceController {
                 accrualDate == null ? "" : accrualDate.toString(), endDate == null ? "" : endDate.toString(),
                 controller.getOffencePageSizeBox().getValue(), pageNumber - 1, controller.getOffenceSortBox().getValue().getValue() +
                         "," + controller.getOffenceSortOrderBox().getValue().getValue()).execute();
-        controller.getOffenceTable().getItems().addAll(offences.body().getContent());
+        if(offences.body().getContent().get(0).getId() != null) {
+            controller.getOffenceTable().getItems().addAll(offences.body().getContent());
+        }
         if(offences.body().getPage().getTotalPages() > totalPages) {
             totalPages = offences.body().getPage().getTotalPages();
         }

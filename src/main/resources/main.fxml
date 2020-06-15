@@ -141,5 +141,41 @@
             </AnchorPane>
          </content>
       </Tab>
+      <Tab text="Штрафы">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="penaltyReaderNameField" layoutX="16.0" layoutY="15.0" prefWidth="376.0" promptText="ФИО читателя" />
+                  <TextField fx:id="penaltyBookNameField" layoutX="408.0" layoutY="15.0" prefWidth="376.0" promptText="Название книги" />
+                  <DatePicker fx:id="penaltyAccrualDatePicker" layoutX="16.0" layoutY="55.0" prefWidth="180.0" promptText="Дата назначения после..." />
+                  <Button fx:id="penaltySearchButton" layoutX="704.0" layoutY="55.0" mnemonicParsing="false" prefWidth="80.0" text="Поиск" />
+                  <TableView fx:id="penaltyTable" layoutX="16.0" layoutY="95.0" prefHeight="430.0" prefWidth="768.0">
+                     <columns>
+                        <TableColumn fx:id="penaltyColumnReaderName" prefWidth="200.0" text="ФИО" />
+                        <TableColumn fx:id="penaltyColumnBookName" prefWidth="173.0" text="Название книги" />
+                        <TableColumn fx:id="penaltyColumnPointOfIssue" prefWidth="93.0" text="Пункт выдачи" />
+                        <TableColumn fx:id="penaltyColumnCost" prefWidth="96.0" text="Размер штрафа" />
+                        <TableColumn fx:id="penaltyColumnAccrualDate" prefWidth="114.0" text="Дата назначения" />
+                        <TableColumn fx:id="penaltyColumnPayDate" prefWidth="91.0" text="Дата оплаты" />
+                     </columns>
+                  </TableView>
+                  <TextField fx:id="penaltyPageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
+                  <Label fx:id="penaltyTotalPagesLabel" layoutX="75.0" layoutY="537.0" text="/ 10">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="penaltySortBox" layoutX="130.0" layoutY="535.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="penaltySortOrderBox" layoutX="296.0" layoutY="535.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="penaltyPageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
+                  <DatePicker fx:id="penaltyPayDatePicker" layoutX="212.0" layoutY="55.0" prefWidth="160.0" promptText="Дата оплаты после..." />
+                  <Label alignment="CENTER" layoutX="388.0" layoutY="39.0" prefWidth="116.0" text="Размер штрафа" />
+                  <TextField fx:id="penaltyCostMoreField" layoutX="388.0" layoutY="55.0" prefWidth="50.0" promptText="От..." />
+                  <TextField fx:id="penaltyCostLessField" layoutX="454.0" layoutY="55.0" prefWidth="50.0" promptText="До..." />
+                  <ComboBox fx:id="penaltyPointOfIssueBox" layoutX="520.0" layoutY="55.0" prefWidth="168.0" promptText="Пункт выдачи" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
   </tabs>
 </TabPane>

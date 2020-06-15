@@ -107,7 +107,9 @@ public class IssueController {
         Response<SpringJson<List<IssueDTO>>> issues = Main.issueRepository.getIssueByBookName(bookName,
                 fileCabinetDTO == null ? 0 : fileCabinetDTO.getId(), controller.getIssuePageSizeBox().getValue(), pageNumber - 1,
                 controller.getIssueSortBox().getValue().getValue() + "," + controller.getIssueSortOrderBox().getValue().getValue()).execute();
-        controller.getIssueTable().getItems().addAll(issues.body().getContent());
+        if(issues.body().getContent().get(0).getId() != null) {
+            controller.getIssueTable().getItems().addAll(issues.body().getContent());
+        }
         if(issues.body().getPage().getTotalPages() > totalPages) {
             totalPages = issues.body().getPage().getTotalPages();
         }

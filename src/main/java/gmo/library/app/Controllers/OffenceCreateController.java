@@ -27,16 +27,16 @@ public class OffenceCreateController {
 
     public static void showOffenceCreateWindow(BookTakeDTO bookTakeDTO, OffenceDTO offenceDTO) {
         try {
-            Stage bookTakeCreate = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(BookTakeCreateController.class.getClassLoader().getResource("offenceCreate.fxml"));
+            Stage offenceCreate = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(OffenceCreateController.class.getClassLoader().getResource("offenceCreate.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
-            bookTakeCreate.setTitle("Добавление нарушения");
-            ((OffenceCreateController)fxmlLoader.getController()).init(bookTakeCreate, bookTakeDTO, offenceDTO);
+            offenceCreate.setTitle("Добавление нарушения");
+            ((OffenceCreateController)fxmlLoader.getController()).init(offenceCreate, bookTakeDTO, offenceDTO);
 
-            bookTakeCreate.setScene(scene);
-            bookTakeCreate.setResizable(false);
-            bookTakeCreate.initModality(Modality.APPLICATION_MODAL);
-            bookTakeCreate.show();
+            offenceCreate.setScene(scene);
+            offenceCreate.setResizable(false);
+            offenceCreate.initModality(Modality.APPLICATION_MODAL);
+            offenceCreate.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

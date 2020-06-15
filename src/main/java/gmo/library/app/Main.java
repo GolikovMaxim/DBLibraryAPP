@@ -37,6 +37,7 @@ public class Main extends Application {
 
     public static BookTakeRepository bookTakeRepository;
     public static OffenceRepository offenceRepository;
+    public static PenaltyRepository penaltyRepository;
 
     private Retrofit retrofit;
 
@@ -74,6 +75,7 @@ public class Main extends Application {
 
         bookTakeRepository = retrofit.create(BookTakeRepository.class);
         offenceRepository = retrofit.create(OffenceRepository.class);
+        penaltyRepository = retrofit.create(PenaltyRepository.class);
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("main.fxml"));
         Scene scene = new Scene(fxmlLoader.load());

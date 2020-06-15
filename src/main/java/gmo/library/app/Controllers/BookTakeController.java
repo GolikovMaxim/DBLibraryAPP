@@ -90,7 +90,9 @@ public class BookTakeController {
                 nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), bookName,
                 takeDate == null ? "" : takeDate.toString(), controller.getBookTakePageSizeBox().getValue(), pageNumber - 1,
                 controller.getBookTakeSortBox().getValue().getValue() + "," + controller.getBookTakeSortOrderBox().getValue().getValue()).execute();
-        controller.getBookTakeTable().getItems().addAll(bookTakes.body().getContent());
+        if(bookTakes.body().getContent().get(0).getId() != null) {
+            controller.getBookTakeTable().getItems().addAll(bookTakes.body().getContent());
+        }
         if(bookTakes.body().getPage().getTotalPages() > totalPages) {
             totalPages = bookTakes.body().getPage().getTotalPages();
         }

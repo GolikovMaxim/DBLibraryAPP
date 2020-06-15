@@ -116,6 +116,31 @@ public class Controller {
     @FXML private ChoiceBox<Sort> offenceSortBox;
     @FXML private ChoiceBox<Sort> offenceSortOrderBox;
     @FXML private ChoiceBox<Integer> offencePageSizeBox;
+    //
+    //штрафы
+    //
+    @FXML private TextField penaltyReaderNameField;
+    @FXML private TextField penaltyBookNameField;
+    @FXML private DatePicker penaltyAccrualDatePicker;
+    @FXML private DatePicker penaltyPayDatePicker;
+    @FXML private ComboBox<PointOfIssueDTO> penaltyPointOfIssueBox;
+    @FXML private TextField penaltyCostMoreField;
+    @FXML private TextField penaltyCostLessField;
+    @FXML private Button penaltySearchButton;
+    //таблица
+    @FXML private TableView<PenaltyDTO> penaltyTable;
+    @FXML private TableColumn<PenaltyDTO, String> penaltyColumnReaderName;
+    @FXML private TableColumn<PenaltyDTO, String> penaltyColumnBookName;
+    @FXML private TableColumn<PenaltyDTO, String> penaltyColumnPointOfIssue;
+    @FXML private TableColumn<PenaltyDTO, String> penaltyColumnCost;
+    @FXML private TableColumn<PenaltyDTO, String> penaltyColumnAccrualDate;
+    @FXML private TableColumn<PenaltyDTO, String> penaltyColumnPayDate;
+    //страницы
+    @FXML private TextField penaltyPageNumberField;
+    @FXML private Label penaltyTotalPagesLabel;
+    @FXML private ChoiceBox<Sort> penaltySortBox;
+    @FXML private ChoiceBox<Sort> penaltySortOrderBox;
+    @FXML private ChoiceBox<Integer> penaltyPageSizeBox;
 
     private int totalPages = 1;
 
@@ -166,6 +191,7 @@ public class Controller {
         IssueController issueController = new IssueController(this);
         BookTakeController bookTakeController = new BookTakeController(this);
         OffenceController offenceController = new OffenceController(this);
+        PenaltyController penaltyController = new PenaltyController(this);
     }
 
     private void showReaderWindow(FullReader reader) {
@@ -304,10 +330,7 @@ public class Controller {
                     pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId(),
                     readerPageSizeBox.getValue() / typeCount, pageNumber - 1,
                     readerSortBox.getValue().getValue() + "," + readerSortOrderBox.getValue().getValue()).execute();
-            processReaders(students.body().getContent());
-            if(students.body().getPage().getTotalPages() > totalPages) {
-                totalPages = students.body().getPage().getTotalPages();
-            }
+            processSpringJSON(students);
         }
         if(studyGroupDTO == null) {
             Response<SpringJson<List<TeacherDTO>>> teachers = Main.teacherRepository.getTeachersByParams(
@@ -315,23 +338,26 @@ public class Controller {
                     pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(), facultyDTO == null ? 0 : facultyDTO.getId(),
                     readerPageSizeBox.getValue() / typeCount, pageNumber - 1,
                     readerSortBox.getValue().getValue() + "," + readerSortOrderBox.getValue().getValue()).execute();
-            processReaders(teachers.body().getContent());
-            if(teachers.body().getPage().getTotalPages() > totalPages) {
-                totalPages = teachers.body().getPage().getTotalPages();
-            }
+            processSpringJSON(teachers);
         }
         if(studyGroupDTO == null && departmentDTO == null && facultyDTO == null) {
             Response<SpringJson<List<OneTimeReaderDTO>>> oneTimeReaders = Main.oneTimeReaderRepository.getOneTimeReadersByParams(
                     nameList.get(0), nameList.get(1), nameList.get(2), pointOfIssueDTO == null ? 0 : pointOfIssueDTO.getId(),
                     readerPageSizeBox.getValue() / typeCount, pageNumber - 1,
                     readerSortBox.getValue().getValue() + "," + readerSortOrderBox.getValue().getValue()).execute();
-            processReaders(oneTimeReaders.body().getContent());
-            if(oneTimeReaders.body().getPage().getTotalPages() > totalPages) {
-                totalPages = oneTimeReaders.body().getPage().getTotalPages();
-            }
+            processSpringJSON(oneTimeReaders);
         }
 
         readerTotalPagesLabel.setText("/ " + totalPages);
+    }
+
+    private <T extends ReaderDTO> void processSpringJSON(Response<SpringJson<List<T>>> readers) {
+        if(readers.body().getContent().get(0).getId() != null) {
+            processReaders(readers.body().getContent());
+        }
+        if(readers.body().getPage().getTotalPages() > totalPages) {
+            totalPages = readers.body().getPage().getTotalPages();
+        }
     }
 
     private <T extends ReaderDTO> void processReaders(List<T> readers) {

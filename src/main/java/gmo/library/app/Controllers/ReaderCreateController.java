@@ -210,7 +210,7 @@ public class ReaderCreateController {
             typePane.getSelectionModel().select(studentTab);
             studyGroupField.setText(reader.getStudyGroup().toString());
             for(FacultyDTO faculty : facultyBox.getItems()) {
-                if(faculty.getName().equals(reader.getFaculty())) {
+                if(faculty != null && faculty.getName().equals(reader.getFaculty())) {
                     facultyBox.getSelectionModel().select(faculty);
                 }
             }
@@ -221,17 +221,17 @@ public class ReaderCreateController {
             oneTimeReaderTab.setDisable(true);
             typePane.getSelectionModel().select(teacherTab);
             for(DepartmentDTO department : departmentBox.getItems()) {
-                if(department.getName().equals(reader.getDepartment())) {
+                if(department != null && department.getName().equals(reader.getDepartment())) {
                     departmentBox.getSelectionModel().select(department);
                 }
             }
             for(DegreeDTO degree : degreeBox.getItems()) {
-                if(degree.getName().equals(reader.getDegree())) {
+                if(degree != null && degree.getName().equals(reader.getDegree())) {
                     degreeBox.getSelectionModel().select(degree);
                 }
             }
             for(GradeDTO grade : gradeBox.getItems()) {
-                if(grade.getName().equals(reader.getDegree())) {
+                if(grade != null && grade.getName().equals(reader.getDegree())) {
                     gradeBox.getSelectionModel().select(grade);
                 }
             }
