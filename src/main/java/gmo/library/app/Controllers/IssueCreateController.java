@@ -16,13 +16,17 @@ public class IssueCreateController {
     @FXML private TextField bookNameField;
     @FXML private TextField bookCountField;
     @FXML private DatePicker receiptDatePicker;
-    @FXML private ChoiceBox<FileCabinetDTO> fileCabinetBox;
+    @FXML private ComboBox<FileCabinetDTO> fileCabinetBox;
     @FXML private Button submitButton;
 
     public void init(Stage stage, IssueController issueController, IssueDTO issue) throws IOException {
         updateInfo(issue);
+        if(issue != null) {
+            stage.setTitle("Редактирование издания");
+        }
         submitButton.setOnAction(event -> {
-            if(bookNameField.getText().equals("") || bookCountField.getText().equals("") || receiptDatePicker.getValue() == null) {
+            if(bookNameField.getText().equals("") || bookCountField.getText().equals("") ||
+                    receiptDatePicker.getValue() == null || fileCabinetBox.getValue() == null) {
                 Main.error("Заполните все поля.");
                 return;
             }
@@ -65,10 +69,10 @@ public class IssueCreateController {
     }
 
     public void updateInfo(IssueDTO issueDTO) throws IOException {
-        fileCabinetBox.getItems().addAll(Main.fileCabinetRepository.getAllFileCabinets().execute().body().getContent());
-        fileCabinetBox.getSelectionModel().select(0);
+        Controller.updateFileCabinets(fileCabinetBox, true);
         if(issueDTO != null) {
             issueLabel.setText("Редактирование издания");
+            submitButton.setText("Изменить");
             bookNameField.setText(issueDTO.getBookName());
             bookCountField.setText("" + issueDTO.getBookCount());
             receiptDatePicker.setValue(LocalDate.parse(issueDTO.getReceiptDate()));

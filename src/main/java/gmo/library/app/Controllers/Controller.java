@@ -3,6 +3,8 @@ package gmo.library.app.Controllers;
 import gmo.library.app.DTO.*;
 import gmo.library.app.Main;
 import gmo.library.app.Repositories.SpringJson;
+import gmo.library.app.Utilities.FullReader;
+import gmo.library.app.Utilities.Sort;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -71,6 +73,49 @@ public class Controller {
     @FXML private ChoiceBox<Sort> issueSortBox;
     @FXML private ChoiceBox<Sort> issueSortOrderBox;
     @FXML private ChoiceBox<Integer> issuePageSizeBox;
+    //
+    //взятые книги
+    //
+    @FXML private TextField bookTakeReaderNameField;
+    @FXML private TextField bookTakeBookNameField;
+    @FXML private DatePicker bookTakeTakeDatePicker;
+    @FXML private ComboBox<PointOfIssueDTO> bookTakePointOfIssueBox;
+    @FXML private Button bookTakeSearchButton;
+    //таблица
+    @FXML private TableView<BookTakeDTO> bookTakeTable;
+    @FXML private TableColumn<BookTakeDTO, String> bookTakeColumnReaderName;
+    @FXML private TableColumn<BookTakeDTO, String> bookTakeColumnBookName;
+    @FXML private TableColumn<BookTakeDTO, String> bookTakeColumnPointOfIssue;
+    @FXML private TableColumn<BookTakeDTO, String> bookTakeColumnTakeDate;
+    @FXML private TableColumn<BookTakeDTO, String> bookTakeColumnReturnDate;
+    //страницы
+    @FXML private TextField bookTakePageNumberField;
+    @FXML private Label bookTakeTotalPagesLabel;
+    @FXML private ChoiceBox<Sort> bookTakeSortBox;
+    @FXML private ChoiceBox<Sort> bookTakeSortOrderBox;
+    @FXML private ChoiceBox<Integer> bookTakePageSizeBox;
+    //
+    //нарушения
+    //
+    @FXML private TextField offenceReaderNameField;
+    @FXML private TextField offenceBookNameField;
+    @FXML private DatePicker offenceAccrualDatePicker;
+    @FXML private DatePicker offenceEndDatePicker;
+    @FXML private ComboBox<PointOfIssueDTO> offencePointOfIssueBox;
+    @FXML private Button offenceSearchButton;
+    //таблица
+    @FXML private TableView<OffenceDTO> offenceTable;
+    @FXML private TableColumn<OffenceDTO, String> offenceColumnReaderName;
+    @FXML private TableColumn<OffenceDTO, String> offenceColumnBookName;
+    @FXML private TableColumn<OffenceDTO, String> offenceColumnPointOfIssue;
+    @FXML private TableColumn<OffenceDTO, String> offenceColumnAccrualDate;
+    @FXML private TableColumn<OffenceDTO, String> offenceColumnEndDate;
+    //страницы
+    @FXML private TextField offencePageNumberField;
+    @FXML private Label offenceTotalPagesLabel;
+    @FXML private ChoiceBox<Sort> offenceSortBox;
+    @FXML private ChoiceBox<Sort> offenceSortOrderBox;
+    @FXML private ChoiceBox<Integer> offencePageSizeBox;
 
     private int totalPages = 1;
 
@@ -108,12 +153,19 @@ public class Controller {
         readerTable.setContextMenu(setContextMenu(() -> {
             showReaderWindow(readerTable.getSelectionModel().getSelectedItem());
         }));
+        MenuItem menuItem = new MenuItem("Добавить взятие книги");
+        menuItem.setOnAction(event -> {
+            BookTakeCreateController.showBookTakeCreateWindow(readerTable.getSelectionModel().getSelectedItem().toReader(), null);
+        });
+        readerTable.getContextMenu().getItems().add(menuItem);
 
         initPagingAndSorting(readerPageSizeBox, readerPageNumberField, readerTotalPagesLabel, readerSortOrderBox, totalPages);
         readerSortBox.getItems().addAll(Sort.EMPTY, ReaderDTO.SORT_BY_LASTNAME, ReaderDTO.SORT_BY_FIRSTNAME, ReaderDTO.SORT_BY_SECONDNAME);
         readerSortBox.getSelectionModel().select(0);
 
         IssueController issueController = new IssueController(this);
+        BookTakeController bookTakeController = new BookTakeController(this);
+        OffenceController offenceController = new OffenceController(this);
     }
 
     private void showReaderWindow(FullReader reader) {
@@ -198,12 +250,8 @@ public class Controller {
         box.getSelectionModel().selectFirst();
     }
 
-    public void fillReaderTableByRetrofit() throws IOException {
-        StudyGroupDTO studyGroupDTO = readerGroupBox.getSelectionModel().getSelectedItem();
-        PointOfIssueDTO pointOfIssueDTO = readerPointOfIssueBox.getSelectionModel().getSelectedItem();
-        DepartmentDTO departmentDTO = readerDepartmentBox.getSelectionModel().getSelectedItem();
-        FacultyDTO facultyDTO = readerFacultyBox.getSelectionModel().getSelectedItem();
-        String[] nameArray = readerFullNameField.getText().split(" ");
+    public static List<String> getReadersName(TextField nameField) {
+        String[] nameArray = nameField.getText().split(" ");
         List<String> nameList = new ArrayList<>();
         for(int i = 0; i < 3; i++) {
             try {
@@ -213,13 +261,28 @@ public class Controller {
                 nameList.add("");
             }
         }
+        return nameList;
+    }
+
+    public static int getPageNumber(String pageNumberText, int totalPages) {
+        int pageNumber;
+        pageNumber = Integer.parseInt(pageNumberText);
+        if(pageNumber < 1 || pageNumber > totalPages) {
+            throw new NumberFormatException();
+        }
+        return pageNumber;
+    }
+
+    public void fillReaderTableByRetrofit() throws IOException {
+        StudyGroupDTO studyGroupDTO = readerGroupBox.getSelectionModel().getSelectedItem();
+        PointOfIssueDTO pointOfIssueDTO = readerPointOfIssueBox.getSelectionModel().getSelectedItem();
+        DepartmentDTO departmentDTO = readerDepartmentBox.getSelectionModel().getSelectedItem();
+        FacultyDTO facultyDTO = readerFacultyBox.getSelectionModel().getSelectedItem();
+        List<String> nameList = getReadersName(readerFullNameField);
 
         int pageNumber;
         try {
-            pageNumber = Integer.parseInt(readerPageNumberField.getText());
-            if(pageNumber < 1 || pageNumber > totalPages) {
-                throw new NumberFormatException();
-            }
+            pageNumber = getPageNumber(readerPageNumberField.getText(), totalPages);
         }
         catch (NumberFormatException nfe) {
             Main.error("Введите верный номер страницы.\n" +

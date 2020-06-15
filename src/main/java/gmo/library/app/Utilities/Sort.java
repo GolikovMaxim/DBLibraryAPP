@@ -1,4 +1,4 @@
-package gmo.library.app.DTO;
+package gmo.library.app.Utilities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

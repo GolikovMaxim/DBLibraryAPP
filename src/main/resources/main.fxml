@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -78,9 +79,66 @@
                </children></AnchorPane>
       </content>
     </Tab>
-      <Tab text="Untitled Tab 2">
+      <Tab text="Взятые книги">
          <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="bookTakeReaderNameField" layoutX="16.0" layoutY="15.0" prefWidth="376.0" promptText="ФИО читателя" />
+                  <TextField fx:id="bookTakeBookNameField" layoutX="408.0" layoutY="15.0" prefWidth="376.0" promptText="Название книги" />
+                  <DatePicker fx:id="bookTakeTakeDatePicker" layoutX="16.0" layoutY="55.0" prefWidth="180.0" promptText="Дата взятия после..." />
+                  <ComboBox fx:id="bookTakePointOfIssueBox" layoutX="212.0" layoutY="55.0" prefWidth="180.0" promptText="Пункт выдачи" />
+                  <Button fx:id="bookTakeSearchButton" layoutX="604.0" layoutY="55.0" mnemonicParsing="false" prefWidth="180.0" text="Поиск" />
+                  <TableView fx:id="bookTakeTable" layoutX="16.0" layoutY="95.0" prefHeight="430.0" prefWidth="768.0">
+                    <columns>
+                      <TableColumn fx:id="bookTakeColumnReaderName" prefWidth="231.0" text="ФИО" />
+                      <TableColumn fx:id="bookTakeColumnBookName" prefWidth="221.0" text="Название книги" />
+                        <TableColumn fx:id="bookTakeColumnPointOfIssue" prefWidth="107.0" text="Пункт выдачи" />
+                        <TableColumn fx:id="bookTakeColumnTakeDate" prefWidth="96.0" text="Дата выдачи" />
+                        <TableColumn fx:id="bookTakeColumnReturnDate" prefWidth="100.0" text="Дата возврата" />
+                    </columns>
+                  </TableView>
+                  <TextField fx:id="bookTakePageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
+                  <Label fx:id="bookTakeTotalPagesLabel" layoutX="75.0" layoutY="537.0" text="/ 10">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="bookTakeSortBox" layoutX="130.0" layoutY="535.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="bookTakeSortOrderBox" layoutX="296.0" layoutY="535.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="bookTakePageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
+               </children></AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Нарушения">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="offenceReaderNameField" layoutX="16.0" layoutY="15.0" prefWidth="376.0" promptText="ФИО читателя" />
+                  <TextField fx:id="offenceBookNameField" layoutX="408.0" layoutY="15.0" prefWidth="376.0" promptText="Название книги" />
+                  <DatePicker fx:id="offenceAccrualDatePicker" layoutX="16.0" layoutY="55.0" prefWidth="180.0" promptText="Дата нарушения после..." />
+                  <ComboBox fx:id="offencePointOfIssueBox" layoutX="408.0" layoutY="55.0" prefWidth="180.0" promptText="Пункт выдачи" />
+                  <Button fx:id="offenceSearchButton" layoutX="604.0" layoutY="55.0" mnemonicParsing="false" prefWidth="180.0" text="Поиск" />
+                  <TableView fx:id="offenceTable" layoutX="16.0" layoutY="95.0" prefHeight="430.0" prefWidth="768.0">
+                     <columns>
+                        <TableColumn fx:id="offenceColumnReaderName" prefWidth="231.0" text="ФИО" />
+                        <TableColumn fx:id="offenceColumnBookName" prefWidth="221.0" text="Название книги" />
+                        <TableColumn fx:id="offenceColumnPointOfIssue" prefWidth="107.0" text="Пункт выдачи" />
+                        <TableColumn fx:id="offenceColumnAccrualDate" prefWidth="105.0" text="Дата нарушения" />
+                        <TableColumn fx:id="offenceColumnEndDate" prefWidth="103.0" text="Дата окончания" />
+                     </columns>
+                  </TableView>
+                  <TextField fx:id="offencePageNumberField" layoutX="16.0" layoutY="535.0" prefWidth="50.0" promptText="Номер" />
+                  <Label fx:id="offenceTotalPagesLabel" layoutX="75.0" layoutY="537.0" text="/ 10">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="offenceSortBox" layoutX="130.0" layoutY="535.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="offenceSortOrderBox" layoutX="296.0" layoutY="535.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="offencePageSizeBox" layoutX="714.0" layoutY="535.0" prefWidth="70.0" />
+                  <DatePicker fx:id="offenceEndDatePicker" layoutX="212.0" layoutY="55.0" prefWidth="180.0" promptText="Дата окончания после..." />
+               </children>
+            </AnchorPane>
          </content>
       </Tab>
   </tabs>

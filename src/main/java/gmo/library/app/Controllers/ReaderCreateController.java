@@ -1,15 +1,12 @@
 package gmo.library.app.Controllers;
 
-import com.google.gson.JsonElement;
 import gmo.library.app.DTO.*;
 import gmo.library.app.Main;
 import gmo.library.app.Repositories.SpringJson;
+import gmo.library.app.Utilities.FullReader;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import okio.Buffer;
-import okio.BufferedSink;
-import org.json.JSONObject;
 import retrofit2.Response;
 
 import java.io.EOFException;
@@ -61,6 +58,10 @@ public class ReaderCreateController {
                 return;
             }
             if(typePane.getSelectionModel().getSelectedItem() == studentTab) {
+                if(facultyBox.getValue() == null || studentPointOfIssueBox.getValue() == null) {
+                    Main.error("Заполните поля студента.");
+                    return;
+                }
                 try {
                     Integer.parseInt(studyGroupField.getText());
                 }
@@ -120,6 +121,11 @@ public class ReaderCreateController {
                 }
             }
             else if(typePane.getSelectionModel().getSelectedItem() == teacherTab) {
+                if(departmentBox.getValue() == null || degreeBox.getValue() == null ||
+                        teacherPointOfIssueBox.getValue() == null || gradeBox.getValue() == null) {
+                    Main.error("Заполните поля преподавателя.");
+                    return;
+                }
                 TeacherDTO teacherDTO = new TeacherDTO();
                 setCommonFields(teacherDTO);
                 teacherDTO.setDegree(degreeBox.getSelectionModel().getSelectedItem());
@@ -149,8 +155,8 @@ public class ReaderCreateController {
                 }
             }
             else if(typePane.getSelectionModel().getSelectedItem() == oneTimeReaderTab) {
-                if(takeDatePicker.getValue() == null) {
-                    Main.error("Выберите дату получения читательского билета.");
+                if(takeDatePicker.getValue() == null || readingRoomBox.getValue() == null) {
+                    Main.error("Заполните все поля одноразового читателя.");
                     return;
                 }
                 OneTimeReaderDTO oneTimeReaderDTO = new OneTimeReaderDTO();
@@ -248,18 +254,18 @@ public class ReaderCreateController {
     }
 
     private void updateBoxesInfo() throws IOException {
-        Controller.updatePointOfIssues(studentPointOfIssueBox, false);
-        Controller.updatePointOfIssues(teacherPointOfIssueBox, false);
-        Controller.updateDepartments(departmentBox, false);
-        Controller.updateFaculties(facultyBox, false);
+        Controller.updatePointOfIssues(studentPointOfIssueBox, true);
+        Controller.updatePointOfIssues(teacherPointOfIssueBox, true);
+        Controller.updateDepartments(departmentBox, true);
+        Controller.updateFaculties(facultyBox, true);
 
         Response<SpringJson<List<DegreeDTO>>> degrees = Main.degreeRepository.getAllDegrees().execute();
-        Controller.update(degreeBox, degrees.body().getContent(), false);
+        Controller.update(degreeBox, degrees.body().getContent(), true);
 
         Response<SpringJson<List<GradeDTO>>> grades = Main.gradeRepository.getAllGrades().execute();
-        Controller.update(gradeBox, grades.body().getContent(), false);
+        Controller.update(gradeBox, grades.body().getContent(), true);
 
         Response<SpringJson<List<ReadingRoomDTO>>> readingRooms = Main.readingRoomRepository.getAllReadingRooms().execute();
-        Controller.update(readingRoomBox, readingRooms.body().getContent(), false);
+        Controller.update(readingRoomBox, readingRooms.body().getContent(), true);
     }
 }

@@ -2,6 +2,7 @@ package gmo.library.app.DTO;
 
 import gmo.library.app.Main;
 import gmo.library.app.Repositories.StudentRepository;
+import gmo.library.app.Utilities.Sort;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class StudentDTO extends ReaderDTO {
         }
     }
 
+    @Override
     public String getURL() {
         return getURL(this);
     }

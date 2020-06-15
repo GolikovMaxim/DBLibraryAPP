@@ -27,6 +27,7 @@ public class OneTimeReaderDTO extends ReaderDTO {
         }
     }
 
+    @Override
     public String getURL() {
         return getURL(this);
     }

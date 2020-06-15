@@ -2,14 +2,12 @@ package gmo.library.app.Controllers;
 
 import gmo.library.app.DTO.FileCabinetDTO;
 import gmo.library.app.DTO.IssueDTO;
-import gmo.library.app.DTO.Sort;
+import gmo.library.app.Utilities.Sort;
 import gmo.library.app.Main;
 import gmo.library.app.Repositories.SpringJson;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import retrofit2.Response;
@@ -93,10 +91,7 @@ public class IssueController {
 
         int pageNumber;
         try {
-            pageNumber = Integer.parseInt(controller.getIssuePageNumberField().getText());
-            if(pageNumber < 1 || pageNumber > totalPages) {
-                throw new NumberFormatException();
-            }
+            pageNumber = Controller.getPageNumber(controller.getIssuePageNumberField().getText(), totalPages);
         }
         catch (NumberFormatException nfe) {
             Main.error("Введите верный номер страницы.\n" +
@@ -116,5 +111,7 @@ public class IssueController {
         if(issues.body().getPage().getTotalPages() > totalPages) {
             totalPages = issues.body().getPage().getTotalPages();
         }
+
+        controller.getIssueTotalPagesLabel().setText("/ " + totalPages);
     }
 }

@@ -1,10 +1,11 @@
 package gmo.library.app.DTO;
 
+import gmo.library.app.Main;
+import gmo.library.app.Repositories.IssueRepository;
+import gmo.library.app.Utilities.Sort;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Setter @Getter
 public class IssueDTO extends AbstractDTO<Long> {
@@ -36,5 +37,13 @@ public class IssueDTO extends AbstractDTO<Long> {
             receiptDate = issueDTO.receiptDate;
             booksInStock = issueDTO.booksInStock;
         }
+    }
+
+    public String getURL() {
+        return getURL(this);
+    }
+
+    public static String getURL(IssueDTO issueDTO) {
+        return Main.SERVER_URL + IssueRepository.URL + "/" + issueDTO.getId();
     }
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="465.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gmo.library.app.Controllers.BookTakeCreateController">
+   <children>
+      <Label fx:id="bookTakeLabel" alignment="CENTER" layoutX="150.0" layoutY="15.0" prefWidth="300.0" text="Добавить данные о взятии книги">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="bookNameField" layoutX="15.0" layoutY="55.0" prefWidth="240.0" promptText="Название книги" />
+      <Button fx:id="issueSearchButton" layoutX="435.0" layoutY="55.0" mnemonicParsing="false" prefWidth="150.0" text="Поиск" />
+      <TableView fx:id="issueTable" layoutX="15.0" layoutY="100.0" prefHeight="231.0" prefWidth="570.0">
+        <columns>
+          <TableColumn fx:id="bookNameColumn" prefWidth="189.0" text="Название книги" />
+          <TableColumn fx:id="fileCabinetColumn" prefWidth="73.0" text="Картотека" />
+            <TableColumn fx:id="pointOfIssueColumn" prefWidth="91.0" text="Пункт выдачи" />
+            <TableColumn fx:id="bookCountColumn" prefWidth="112.0" text="Количество книг" />
+            <TableColumn fx:id="booksInStockColumn" prefWidth="104.0" text="Книг в наличии" />
+        </columns>
+      </TableView>
+      <TextField fx:id="pageNumberField" layoutX="15.0" layoutY="345.0" prefWidth="50.0" promptText="Номер" />
+      <Label fx:id="totalPagesLabel" layoutX="70.0" layoutY="347.0" text="/ 10">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="sortBox" layoutX="120.0" layoutY="345.0" prefWidth="150.0" />
+      <ChoiceBox fx:id="sortOrderBox" layoutX="285.0" layoutY="345.0" prefWidth="150.0" />
+      <ChoiceBox fx:id="pageSizeBox" layoutX="515.0" layoutY="345.0" prefHeight="25.0" prefWidth="70.0" />
+      <TextField fx:id="readerNameField" editable="false" layoutX="15.0" layoutY="385.0" prefHeight="25.0" prefWidth="240.0" promptText="Имя пользователя" />
+      <DatePicker fx:id="returnDatePicker" layoutX="435.0" layoutY="385.0" prefWidth="150.0" promptText="Дата возврата" />
+      <DatePicker fx:id="takeDatePicker" layoutX="270.0" layoutY="385.0" prefWidth="150.0" promptText="Дата выдачи" />
+      <Button fx:id="submitButton" layoutX="435.0" layoutY="425.0" mnemonicParsing="false" prefWidth="150.0" text="Добавить" />
+      <ComboBox fx:id="pointOfIssueBox" layoutX="15.0" layoutY="425.0" prefWidth="150.0" promptText="Пункт выдачи" />
+      <ComboBox fx:id="fileCabinetBox" layoutX="270.0" layoutY="55.0" prefWidth="150.0" promptText="Картотека" />
+   </children>
+</AnchorPane>
